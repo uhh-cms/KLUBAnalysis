@@ -4196,6 +4196,14 @@ int main (int argc, char** argv)
       theSmallTree.m_bjet1_bMVAID  = theBigTree.pfCombinedMVAV2BJetTags->at (bjet1idx) ;
       theSmallTree.m_bjet1_PUjetIDupdated = theBigTree.jets_PUJetID->at(bjet1idx);
       theSmallTree.m_bjet1_flav = theBigTree.jets_HadronFlavour->at (bjet1idx) ;
+      theSmallTree.m_bjet1_pnet_bb = theBigTree.bParticleNetAK4JetTags_probbb->at(bjet1idx);
+      theSmallTree.m_bjet1_pnet_cc = theBigTree.bParticleNetAK4JetTags_probpu->at(bjet1idx);
+      theSmallTree.m_bjet1_pnet_b = theBigTree.bParticleNetAK4JetTags_probcc->at(bjet1idx);
+      theSmallTree.m_bjet1_pnet_c = theBigTree.bParticleNetAK4JetTags_probundef->at(bjet1idx);
+      theSmallTree.m_bjet1_pnet_g = theBigTree.bParticleNetAK4JetTags_probc->at(bjet1idx);
+      theSmallTree.m_bjet1_pnet_uds = theBigTree.bParticleNetAK4JetTags_probb->at(bjet1idx);
+      theSmallTree.m_bjet1_pnet_pu = theBigTree.bParticleNetAK4JetTags_probuds->at(bjet1idx);
+      theSmallTree.m_bjet1_pnet_undef = theBigTree.bParticleNetAK4JetTags_probg->at(bjet1idx);
 
       theSmallTree.m_bjet2_pt   = tlv_secondBjet.Pt () ;
       theSmallTree.m_bjet2_eta  = tlv_secondBjet.Eta () ;
@@ -4210,7 +4218,14 @@ int main (int argc, char** argv)
       theSmallTree.m_bjet2_bMVAID  = theBigTree.pfCombinedMVAV2BJetTags->at (bjet2idx) ;
       theSmallTree.m_bjet2_PUjetIDupdated = theBigTree.jets_PUJetID->at(bjet2idx);
       theSmallTree.m_bjet2_flav = theBigTree.jets_HadronFlavour->at (bjet2idx) ;
-
+      theSmallTree.m_bjet2_pnet_bb = theBigTree.bParticleNetAK4JetTags_probbb->at(bjet2idx);
+      theSmallTree.m_bjet2_pnet_cc = theBigTree.bParticleNetAK4JetTags_probpu->at(bjet2idx);
+      theSmallTree.m_bjet2_pnet_b = theBigTree.bParticleNetAK4JetTags_probcc->at(bjet2idx);
+      theSmallTree.m_bjet2_pnet_c = theBigTree.bParticleNetAK4JetTags_probundef->at(bjet2idx);
+      theSmallTree.m_bjet2_pnet_g = theBigTree.bParticleNetAK4JetTags_probc->at(bjet2idx);
+      theSmallTree.m_bjet2_pnet_uds = theBigTree.bParticleNetAK4JetTags_probb->at(bjet2idx);
+      theSmallTree.m_bjet2_pnet_pu = theBigTree.bParticleNetAK4JetTags_probuds->at(bjet2idx);
+      theSmallTree.m_bjet2_pnet_undef = theBigTree.bParticleNetAK4JetTags_probg->at(bjet2idx);
 
       theSmallTree.m_bjets_bID  = theBigTree.bCSVscore->at (bjet1idx) +theBigTree.bCSVscore->at (bjet2idx) ;
       theSmallTree.m_bjets_bID_deepCSV  = theBigTree.bDeepCSV_probb->at(bjet1idx) + theBigTree.bDeepCSV_probbb->at(bjet1idx) + theBigTree.bDeepCSV_probb->at(bjet2idx) + theBigTree.bDeepCSV_probbb->at(bjet2idx);
@@ -4869,6 +4884,14 @@ int main (int argc, char** argv)
 	theSmallTree.m_VBFjet1_ctag_deepFlavor = theBigTree.bDeepFlavor_probc->at(VBFidx1) ;
 	theSmallTree.m_VBFjet1_CvsL = getCvsL(theBigTree, VBFidx1);
 	theSmallTree.m_VBFjet1_CvsB = getCvsB(theBigTree, VBFidx1);
+  theSmallTree.m_VBFjet1_pnet_bb = theBigTree.bParticleNetAK4JetTags_probbb->at(VBFidx1);
+  theSmallTree.m_VBFjet1_pnet_cc = theBigTree.bParticleNetAK4JetTags_probpu->at(VBFidx1);
+  theSmallTree.m_VBFjet1_pnet_b = theBigTree.bParticleNetAK4JetTags_probcc->at(VBFidx1);
+  theSmallTree.m_VBFjet1_pnet_c = theBigTree.bParticleNetAK4JetTags_probundef->at(VBFidx1);
+  theSmallTree.m_VBFjet1_pnet_g = theBigTree.bParticleNetAK4JetTags_probc->at(VBFidx1);
+  theSmallTree.m_VBFjet1_pnet_uds = theBigTree.bParticleNetAK4JetTags_probb->at(VBFidx1);
+  theSmallTree.m_VBFjet1_pnet_pu = theBigTree.bParticleNetAK4JetTags_probuds->at(VBFidx1);
+  theSmallTree.m_VBFjet1_pnet_undef = theBigTree.bParticleNetAK4JetTags_probg->at(VBFidx1);
 	theSmallTree.m_VBFjet1_PUjetIDupdated = theBigTree.jets_PUJetID->at (VBFidx1) ;
 	theSmallTree.m_VBFjet1_flav       = (theBigTree.jets_HadronFlavour->at (VBFidx1)) ;
 	theSmallTree.m_VBFjet1_hasgenjet  = hasgj1_VBF ;
@@ -4908,6 +4931,14 @@ int main (int argc, char** argv)
 	theSmallTree.m_VBFjet2_ctag_deepFlavor = theBigTree.bDeepFlavor_probc->at(VBFidx2) ;
 	theSmallTree.m_VBFjet2_CvsL = getCvsL(theBigTree, VBFidx2);
 	theSmallTree.m_VBFjet2_CvsB = getCvsB(theBigTree, VBFidx2);
+  theSmallTree.m_VBFjet2_pnet_bb = theBigTree.bParticleNetAK4JetTags_probbb->at(VBFidx2);
+  theSmallTree.m_VBFjet2_pnet_cc = theBigTree.bParticleNetAK4JetTags_probpu->at(VBFidx2);
+  theSmallTree.m_VBFjet2_pnet_b = theBigTree.bParticleNetAK4JetTags_probcc->at(VBFidx2);
+  theSmallTree.m_VBFjet2_pnet_c = theBigTree.bParticleNetAK4JetTags_probundef->at(VBFidx2);
+  theSmallTree.m_VBFjet2_pnet_g = theBigTree.bParticleNetAK4JetTags_probc->at(VBFidx2);
+  theSmallTree.m_VBFjet2_pnet_uds = theBigTree.bParticleNetAK4JetTags_probb->at(VBFidx2);
+  theSmallTree.m_VBFjet2_pnet_pu = theBigTree.bParticleNetAK4JetTags_probuds->at(VBFidx2);
+  theSmallTree.m_VBFjet2_pnet_undef = theBigTree.bParticleNetAK4JetTags_probg->at(VBFidx2);
 	theSmallTree.m_VBFjet2_PUjetIDupdated = theBigTree.jets_PUJetID->at (VBFidx2) ;
 	theSmallTree.m_VBFjet2_flav       = (theBigTree.jets_HadronFlavour->at (VBFidx2)) ;
 	theSmallTree.m_VBFjet2_hasgenjet  = hasgj2_VBF ;
@@ -5065,6 +5096,15 @@ int main (int argc, char** argv)
 	theSmallTree.m_jets_CvsB.push_back( getCvsB(theBigTree, iJet) );
 	theSmallTree.m_jets_flav.push_back (theBigTree.jets_HadronFlavour->at (iJet)) ;
 	theSmallTree.m_jets_hasgenjet.push_back (hasgj) ;
+  theSmallTree.m_jets_pnet_bb.push_back(theBigTree.bParticleNetAK4JetTags_probbb->at(iJet));
+  theSmallTree.m_jets_pnet_cc.push_back(theBigTree.bParticleNetAK4JetTags_probpu->at(iJet));
+  theSmallTree.m_jets_pnet_b.push_back(theBigTree.bParticleNetAK4JetTags_probcc->at(iJet));
+  theSmallTree.m_jets_pnet_c.push_back(theBigTree.bParticleNetAK4JetTags_probundef->at(iJet));
+  theSmallTree.m_jets_pnet_g.push_back(theBigTree.bParticleNetAK4JetTags_probc->at(iJet));
+  theSmallTree.m_jets_pnet_uds.push_back(theBigTree.bParticleNetAK4JetTags_probb->at(iJet));
+  theSmallTree.m_jets_pnet_pu.push_back(theBigTree.bParticleNetAK4JetTags_probuds->at(iJet));
+  theSmallTree.m_jets_pnet_undef.push_back(theBigTree.bParticleNetAK4JetTags_probg->at(iJet));
+
 	++theSmallTree.m_njets ;
       } // loop over jets
 
@@ -5277,6 +5317,14 @@ int main (int argc, char** argv)
             theSmallTree.m_addJetCentr1_CvsL            = getCvsL(theBigTree, iJet);
             theSmallTree.m_addJetCentr1_CvsB            = getCvsB(theBigTree, iJet);
             if (jets_and_HHbtag.find(iJet) != jets_and_HHbtag.end()) theSmallTree.m_addJetCentr1_HHbtag = jets_and_HHbtag[iJet];
+            theSmallTree.m_addJetCentr1_pnet_bb = theBigTree.bParticleNetAK4JetTags_probbb->at(iJet);
+            theSmallTree.m_addJetCentr1_pnet_cc = theBigTree.bParticleNetAK4JetTags_probpu->at(iJet);
+            theSmallTree.m_addJetCentr1_pnet_b = theBigTree.bParticleNetAK4JetTags_probcc->at(iJet);
+            theSmallTree.m_addJetCentr1_pnet_c = theBigTree.bParticleNetAK4JetTags_probundef->at(iJet);
+            theSmallTree.m_addJetCentr1_pnet_g = theBigTree.bParticleNetAK4JetTags_probc->at(iJet);
+            theSmallTree.m_addJetCentr1_pnet_uds = theBigTree.bParticleNetAK4JetTags_probb->at(iJet);
+            theSmallTree.m_addJetCentr1_pnet_pu = theBigTree.bParticleNetAK4JetTags_probuds->at(iJet);
+            theSmallTree.m_addJetCentr1_pnet_undef = theBigTree.bParticleNetAK4JetTags_probg->at(iJet);
             theSmallTree.m_addJetCentr1_smearFactor = jets_and_smearFactor[iJet];
             for (int isource = 0; isource < N_jecSources; isource++)
             {
@@ -5316,6 +5364,14 @@ int main (int argc, char** argv)
             theSmallTree.m_addJetCentr2_CvsL            = getCvsL(theBigTree, iJet);
             theSmallTree.m_addJetCentr2_CvsB            = getCvsB(theBigTree, iJet);
             if (jets_and_HHbtag.find(iJet) != jets_and_HHbtag.end()) theSmallTree.m_addJetCentr2_HHbtag = jets_and_HHbtag[iJet];
+            theSmallTree.m_addJetCentr2_pnet_bb = theBigTree.bParticleNetAK4JetTags_probbb->at(iJet);
+            theSmallTree.m_addJetCentr2_pnet_cc = theBigTree.bParticleNetAK4JetTags_probpu->at(iJet);
+            theSmallTree.m_addJetCentr2_pnet_b = theBigTree.bParticleNetAK4JetTags_probcc->at(iJet);
+            theSmallTree.m_addJetCentr2_pnet_c = theBigTree.bParticleNetAK4JetTags_probundef->at(iJet);
+            theSmallTree.m_addJetCentr2_pnet_g = theBigTree.bParticleNetAK4JetTags_probc->at(iJet);
+            theSmallTree.m_addJetCentr2_pnet_uds = theBigTree.bParticleNetAK4JetTags_probb->at(iJet);
+            theSmallTree.m_addJetCentr2_pnet_pu = theBigTree.bParticleNetAK4JetTags_probuds->at(iJet);
+            theSmallTree.m_addJetCentr2_pnet_undef = theBigTree.bParticleNetAK4JetTags_probg->at(iJet);
             theSmallTree.m_addJetCentr2_smearFactor = jets_and_smearFactor[iJet];
             for (int isource = 0; isource < N_jecSources; isource++)
             {
@@ -5355,6 +5411,14 @@ int main (int argc, char** argv)
             theSmallTree.m_addJetCentr3_CvsL            = getCvsL(theBigTree, iJet);
             theSmallTree.m_addJetCentr3_CvsB            = getCvsB(theBigTree, iJet);
             if (jets_and_HHbtag.find(iJet) != jets_and_HHbtag.end()) theSmallTree.m_addJetCentr3_HHbtag = jets_and_HHbtag[iJet];
+            theSmallTree.m_addJetCentr3_pnet_bb = theBigTree.bParticleNetAK4JetTags_probbb->at(iJet);
+            theSmallTree.m_addJetCentr3_pnet_cc = theBigTree.bParticleNetAK4JetTags_probpu->at(iJet);
+            theSmallTree.m_addJetCentr3_pnet_b = theBigTree.bParticleNetAK4JetTags_probcc->at(iJet);
+            theSmallTree.m_addJetCentr3_pnet_c = theBigTree.bParticleNetAK4JetTags_probundef->at(iJet);
+            theSmallTree.m_addJetCentr3_pnet_g = theBigTree.bParticleNetAK4JetTags_probc->at(iJet);
+            theSmallTree.m_addJetCentr3_pnet_uds = theBigTree.bParticleNetAK4JetTags_probb->at(iJet);
+            theSmallTree.m_addJetCentr3_pnet_pu = theBigTree.bParticleNetAK4JetTags_probuds->at(iJet);
+            theSmallTree.m_addJetCentr3_pnet_undef = theBigTree.bParticleNetAK4JetTags_probg->at(iJet);
             theSmallTree.m_addJetCentr3_smearFactor = jets_and_smearFactor[iJet];
             for (int isource = 0; isource < N_jecSources; isource++)
             {
@@ -5394,6 +5458,14 @@ int main (int argc, char** argv)
             theSmallTree.m_addJetCentr4_CvsL            = getCvsL(theBigTree, iJet);
             theSmallTree.m_addJetCentr4_CvsB            = getCvsB(theBigTree, iJet);
             if (jets_and_HHbtag.find(iJet) != jets_and_HHbtag.end()) theSmallTree.m_addJetCentr4_HHbtag = jets_and_HHbtag[iJet];
+            theSmallTree.m_addJetCentr4_pnet_bb = theBigTree.bParticleNetAK4JetTags_probbb->at(iJet);
+            theSmallTree.m_addJetCentr4_pnet_cc = theBigTree.bParticleNetAK4JetTags_probpu->at(iJet);
+            theSmallTree.m_addJetCentr4_pnet_b = theBigTree.bParticleNetAK4JetTags_probcc->at(iJet);
+            theSmallTree.m_addJetCentr4_pnet_c = theBigTree.bParticleNetAK4JetTags_probundef->at(iJet);
+            theSmallTree.m_addJetCentr4_pnet_g = theBigTree.bParticleNetAK4JetTags_probc->at(iJet);
+            theSmallTree.m_addJetCentr4_pnet_uds = theBigTree.bParticleNetAK4JetTags_probb->at(iJet);
+            theSmallTree.m_addJetCentr4_pnet_pu = theBigTree.bParticleNetAK4JetTags_probuds->at(iJet);
+            theSmallTree.m_addJetCentr4_pnet_undef = theBigTree.bParticleNetAK4JetTags_probg->at(iJet);
             theSmallTree.m_addJetCentr4_smearFactor = jets_and_smearFactor[iJet];
             for (int isource = 0; isource < N_jecSources; isource++)
             {
@@ -5433,6 +5505,14 @@ int main (int argc, char** argv)
             theSmallTree.m_addJetCentr5_CvsL            = getCvsL(theBigTree, iJet);
             theSmallTree.m_addJetCentr5_CvsB            = getCvsB(theBigTree, iJet);
             if (jets_and_HHbtag.find(iJet) != jets_and_HHbtag.end()) theSmallTree.m_addJetCentr5_HHbtag = jets_and_HHbtag[iJet];
+            theSmallTree.m_addJetCentr5_pnet_bb = theBigTree.bParticleNetAK4JetTags_probbb->at(iJet);
+            theSmallTree.m_addJetCentr5_pnet_cc = theBigTree.bParticleNetAK4JetTags_probpu->at(iJet);
+            theSmallTree.m_addJetCentr5_pnet_b = theBigTree.bParticleNetAK4JetTags_probcc->at(iJet);
+            theSmallTree.m_addJetCentr5_pnet_c = theBigTree.bParticleNetAK4JetTags_probundef->at(iJet);
+            theSmallTree.m_addJetCentr5_pnet_g = theBigTree.bParticleNetAK4JetTags_probc->at(iJet);
+            theSmallTree.m_addJetCentr5_pnet_uds = theBigTree.bParticleNetAK4JetTags_probb->at(iJet);
+            theSmallTree.m_addJetCentr5_pnet_pu = theBigTree.bParticleNetAK4JetTags_probuds->at(iJet);
+            theSmallTree.m_addJetCentr5_pnet_undef = theBigTree.bParticleNetAK4JetTags_probg->at(iJet);
             theSmallTree.m_addJetCentr5_smearFactor = jets_and_smearFactor[iJet];
             for (int isource = 0; isource < N_jecSources; isource++)
             {
@@ -5794,6 +5874,11 @@ int main (int argc, char** argv)
 	  theSmallTree.m_fatjet_bID  = theBigTree.ak8jets_CSV->at(fjIdx);
 	  theSmallTree.m_fatjet_bID_deepCSV  = theBigTree.ak8jets_deepCSV_probb->at(fjIdx) + theBigTree.ak8jets_deepCSV_probbb->at(fjIdx);
 	  theSmallTree.m_fatjet_bID_deepFlavor  = theBigTree.ak8jets_deepFlavor_probb->at(fjIdx) + theBigTree.ak8jets_deepFlavor_probbb->at(fjIdx) + theBigTree.ak8jets_deepFlavor_problepb->at(fjIdx);
+    theSmallTree.m_fatjet_massIndependentDeepDoubleBvLJetTags_probHbb = theBigTree.ak8jets_massIndependentDeepDoubleBvLJetTags_probHbb->at(fjIdx);
+    theSmallTree.m_fatjet_deepDoubleBvLJetTags_probHbb = theBigTree.ak8jets_deepDoubleBvLJetTags_probHbb->at(fjIdx);
+    theSmallTree.m_fatjet_deepBoostedJetTags_probHbb = theBigTree.ak8jets_deepBoostedJetTags_probHbb->at(fjIdx);
+    theSmallTree.m_fatjet_particleNetJetTags_probHbb = theBigTree.ak8jets_particleNetJetTags_probHbb->at(fjIdx);
+    theSmallTree.m_fatjet_particleNetDiscriminatorsJetTags_HbbvsQCD = theBigTree.ak8jets_particleNetDiscriminatorsJetTags_HbbvsQCD->at(fjIdx);
 	  theSmallTree.m_fatjet_filteredMass = theBigTree.ak8jets_FilteredMass -> at(fjIdx) ;
 	  theSmallTree.m_fatjet_prunedMass   = theBigTree.ak8jets_PrunedMass   -> at(fjIdx) ;
 	  theSmallTree.m_fatjet_trimmedMass  = theBigTree.ak8jets_TrimmedMass  -> at(fjIdx) ;
