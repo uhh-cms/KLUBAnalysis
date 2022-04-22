@@ -322,6 +322,24 @@ struct smallTree
       m_dau2_byMediumCombinedIsolationDeltaBetaCorr3Hits= false;
       m_dau2_byTightCombinedIsolationDeltaBetaCorr3Hits= false;
 
+      m_genH1_pt = -1;
+      m_genH1_eta = -1;
+      m_genH1_phi = -1;
+      m_genH1_e = -1;
+      m_genH2_pt = -1;
+      m_genH2_eta = -1;
+      m_genH2_phi = -1;
+      m_genH2_e = -1;
+
+      m_genB1_pt = -1;
+      m_genB1_eta = -1;
+      m_genB1_phi = -1;
+      m_genB1_e = -1;
+      m_genB2_pt = -1;
+      m_genB2_eta = -1;
+      m_genB2_phi = -1;
+      m_genB2_e = -1;
+
       m_genNu1_pt = -1;
       m_genNu1_eta = -1;
       m_genNu1_phi = -1;
@@ -1485,6 +1503,24 @@ struct smallTree
       m_smallT->Branch ("dau2_byLooseCombinedIsolationDeltaBetaCorr3Hits", &m_dau2_byLooseCombinedIsolationDeltaBetaCorr3Hits, "dau2_byLooseCombinedIsolationDeltaBetaCorr3Hits/O") ;
       m_smallT->Branch ("dau2_byMediumCombinedIsolationDeltaBetaCorr3Hits", &m_dau2_byMediumCombinedIsolationDeltaBetaCorr3Hits, "dau2_byMediumCombinedIsolationDeltaBetaCorr3Hits/O") ;
       m_smallT->Branch ("dau2_byTightCombinedIsolationDeltaBetaCorr3Hits", &m_dau2_byTightCombinedIsolationDeltaBetaCorr3Hits, "dau2_byTightCombinedIsolationDeltaBetaCorr3Hits/O") ;
+
+      m_smallT->Branch("m_genH1_pt", &m_genH1_pt  , "genH1_pt/F");
+      m_smallT->Branch("m_genH1_eta", &m_genH1_eta  , "genH1_eta/F");
+      m_smallT->Branch("m_genH1_phi", &m_genH1_phi  , "genH1_phi/F");
+      m_smallT->Branch("m_genH1_e", &m_genH1_e  , "genH1_e/F");
+      m_smallT->Branch("m_genH2_pt", &m_genH2_pt  , "genH2_pt/F");
+      m_smallT->Branch("m_genH2_eta", &m_genH2_eta  , "genH2_eta/F");
+      m_smallT->Branch("m_genH2_phi", &m_genH2_phi  , "genH2_phi/F");
+      m_smallT->Branch("m_genH2_e", &m_genH2_e  , "genH2_e/F");
+
+      m_smallT->Branch("m_genB1_pt", &m_genB1_pt  , "genB1_pt/F");
+      m_smallT->Branch("m_genB1_eta", &m_genB1_eta  , "genB1_eta/F");
+      m_smallT->Branch("m_genB1_phi", &m_genB1_phi  , "genB1_phi/F");
+      m_smallT->Branch("m_genB1_e", &m_genB1_e  , "genB1_e/F");
+      m_smallT->Branch("m_genB2_pt", &m_genB2_pt  , "genB2_pt/F");
+      m_smallT->Branch("m_genB2_eta", &m_genB2_eta  , "genB2_eta/F");
+      m_smallT->Branch("m_genB2_phi", &m_genB2_phi  , "genB2_phi/F");
+      m_smallT->Branch("m_genB2_e", &m_genB2_e  , "genB2_e/F");
 
       m_smallT->Branch("genNu1_pt", &m_genNu1_pt  , "genNu1_pt/F");
       m_smallT->Branch("genNu1_eta", &m_genNu1_eta , "genNu1_eta/F");
@@ -2650,6 +2686,24 @@ struct smallTree
   Bool_t m_dau2_byLooseCombinedIsolationDeltaBetaCorr3Hits;
   Bool_t m_dau2_byMediumCombinedIsolationDeltaBetaCorr3Hits;
   Bool_t m_dau2_byTightCombinedIsolationDeltaBetaCorr3Hits;
+
+  Float_t m_genH1_pt;
+  Float_t m_genH1_eta;
+  Float_t m_genH1_phi;
+  Float_t m_genH1_e;
+  Float_t m_genH2_pt;
+  Float_t m_genH2_eta;
+  Float_t m_genH2_phi;
+  Float_t m_genH2_e;
+
+  Float_t m_genB1_pt;
+  Float_t m_genB1_eta;
+  Float_t m_genB1_phi;
+  Float_t m_genB1_e;
+  Float_t m_genB2_pt;
+  Float_t m_genB2_eta;
+  Float_t m_genB2_phi;
+  Float_t m_genB2_e;
 
   Float_t m_genNu1_pt;
   Float_t m_genNu1_eta;
