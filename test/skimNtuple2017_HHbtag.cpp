@@ -1259,8 +1259,12 @@ int main (int argc, char** argv)
 
     int idx1hs_b = -1;     // bjet-1 index     // FRA DEBUG
     int idx2hs_b = -1;     // bjet-2 index
+    int idx1hs_tau = -1;   // tau-1 index
+    int idx2hs_tau = -1;   // tau-2 index
     TLorentzVector vGenB1; // bjet-1 tlv
-    TLorentzVector vGenB2; // bjet-2 tlv
+    TLorentzVector vGenB2;   // bjet-2 tlv
+    TLorentzVector vGenTau1; // tau-1 tlv
+    TLorentzVector vGenTau2; // tau-2 tlv
     TLorentzVector vH1, vH2;
     if (isHHsignal || HHrewType != kNone) // isHHsignal: only to do loop on genparts, but no rew
     {
@@ -1361,6 +1365,16 @@ int main (int argc, char** argv)
 	  }
 	}
 
+  if ( abs(pdg) == 15 && isHardProcess)
+  {
+    if (idx1hs_tau == -1) idx1hs_tau = igen;
+    else if (idx2hs_tau == -1) idx2hs_tau = igen;
+    else
+    {
+      cout << "** ERROR: there are more than 2 hard scatter tau leptons: evt = " << theBigTree.EventNumber << endl;
+    }
+  }
+
       }
 
 
@@ -1418,9 +1432,9 @@ int main (int argc, char** argv)
       vH2.SetPxPyPzE (theBigTree.genpart_px->at(idx2), theBigTree.genpart_py->at(idx2), theBigTree.genpart_pz->at(idx2), theBigTree.genpart_e->at(idx2) );
       vSum = vH1+vH2;
       mHH = vSum.M();
-      vH1.Boost(-vSum.BoostVector());
-      ct1 = vH1.CosTheta();
-
+      TLorentzVector vH1_boosted(vH1);
+      vH1_boosted.Boost(-vSum.BoostVector());
+      ct1 = vH1_boosted.CosTheta();
 
       // FRA DEBUG - build gen b jets
       if (idx1hs_b != -1 && idx2hs_b != -1)
@@ -1430,6 +1444,14 @@ int main (int argc, char** argv)
       }
       else
 	cout << "** ERROR: couldn't find 2 H->bb gen dec prod " << idx1hs_b << " " << idx2hs_b << endl;
+
+      if (idx1hs_tau != -1 && idx2hs_tau != -1)
+      {
+  vGenTau1.SetPxPyPzE (theBigTree.genpart_px->at(idx1hs_tau), theBigTree.genpart_py->at(idx1hs_tau), theBigTree.genpart_pz->at(idx1hs_tau), theBigTree.genpart_e->at(idx1hs_tau) );
+  vGenTau2.SetPxPyPzE (theBigTree.genpart_px->at(idx2hs_tau), theBigTree.genpart_py->at(idx2hs_tau), theBigTree.genpart_pz->at(idx2hs_tau), theBigTree.genpart_e->at(idx2hs_tau) );
+      }
+      else
+  cout << "** ERROR: couldn't find 2 H->tautau gen dec prod " << idx1hs_tau << " " << idx2hs_tau << endl;
 
 
       if (HHrewType == kDiffRew)      HHweight = hhreweighter->getWeight(mHH, ct1);
@@ -1792,8 +1814,8 @@ int main (int argc, char** argv)
     TLorentzVector vGenNu2; // neutrino associated to tau2
     TLorentzVector vGenNuNoMatch; // neutrino associated to tau2
     // also getting gen vis tau 4vec for reco matching
-    TLorentzVector vGenTau1;
-    TLorentzVector vGenTau2;
+    TLorentzVector vGenTau1Vis;
+    TLorentzVector vGenTau2Vis;
     int gentau1_idx = -1;
     int gentau2_idx = -1;
     if(isMC) {
@@ -1834,19 +1856,19 @@ int main (int argc, char** argv)
           match2 = (vGenTauVis.DeltaR(tlv_secondLepton)<0.3);
 
           if( match1 && !match2 ) {
-            vGenTau1 = vGenTauVis;
+            vGenTau1Vis = vGenTauVis;
             gentau1_idx = mothIdx;
           }
           if( !match1 &&  match2 ) {
-            vGenTau2 = vGenTauVis;
+            vGenTau2Vis = vGenTauVis;
             gentau2_idx = mothIdx;
           }
           if( match1 &&  match2 ) { // unlikely I guess
             if (vGenTauVis.DeltaR(tlv_firstLepton)<vGenTauVis.DeltaR(tlv_secondLepton)){
-              vGenTau1 = vGenTauVis;
+              vGenTau1Vis = vGenTauVis;
               gentau1_idx = mothIdx;
             } else {
-              vGenTau2 = vGenTauVis;
+              vGenTau2Vis = vGenTauVis;
               gentau2_idx = mothIdx;
             }
           }
@@ -2426,6 +2448,15 @@ int main (int argc, char** argv)
       theSmallTree.m_genB2_eta = vGenB2.Eta();
       theSmallTree.m_genB2_phi = vGenB2.Phi();
       theSmallTree.m_genB2_e = vGenB2.E();
+
+      theSmallTree.m_genTau1_pt = vGenTau1.Pt();
+      theSmallTree.m_genTau1_eta = vGenTau1.Eta();
+      theSmallTree.m_genTau1_phi = vGenTau1.Phi();
+      theSmallTree.m_genTau1_e = vGenTau1.E();
+      theSmallTree.m_genTau2_pt = vGenTau2.Pt();
+      theSmallTree.m_genTau2_eta = vGenTau2.Eta();
+      theSmallTree.m_genTau2_phi = vGenTau2.Phi();
+      theSmallTree.m_genTau2_e = vGenTau2.E();
     }
 
     ///////////////////////////////////

@@ -340,6 +340,15 @@ struct smallTree
       m_genB2_phi = -1;
       m_genB2_e = -1;
 
+      m_genTau1_pt = -1;
+      m_genTau1_eta = -1;
+      m_genTau1_phi = -1;
+      m_genTau1_e = -1;
+      m_genTau2_pt = -1;
+      m_genTau2_eta = -1;
+      m_genTau2_phi = -1;
+      m_genTau2_e = -1;
+
       m_genNu1_pt = -1;
       m_genNu1_eta = -1;
       m_genNu1_phi = -1;
@@ -1521,6 +1530,15 @@ struct smallTree
       m_smallT->Branch("m_genB2_eta", &m_genB2_eta  , "genB2_eta/F");
       m_smallT->Branch("m_genB2_phi", &m_genB2_phi  , "genB2_phi/F");
       m_smallT->Branch("m_genB2_e", &m_genB2_e  , "genB2_e/F");
+
+      m_smallT->Branch("m_genTau1_pt", &m_genTau1_pt  , "genTau1_pt/F");
+      m_smallT->Branch("m_genTau1_eta", &m_genTau1_eta  , "genTau1_eta/F");
+      m_smallT->Branch("m_genTau1_phi", &m_genTau1_phi  , "genTau1_phi/F");
+      m_smallT->Branch("m_genTau1_e", &m_genTau1_e  , "genTau1_e/F");
+      m_smallT->Branch("m_genTau2_pt", &m_genTau2_pt  , "genTau2_pt/F");
+      m_smallT->Branch("m_genTau2_eta", &m_genTau2_eta  , "genTau2_eta/F");
+      m_smallT->Branch("m_genTau2_phi", &m_genTau2_phi  , "genTau2_phi/F");
+      m_smallT->Branch("m_genTau2_e", &m_genTau2_e  , "genTau2_e/F");
 
       m_smallT->Branch("genNu1_pt", &m_genNu1_pt  , "genNu1_pt/F");
       m_smallT->Branch("genNu1_eta", &m_genNu1_eta , "genNu1_eta/F");
@@ -2704,6 +2722,15 @@ struct smallTree
   Float_t m_genB2_eta;
   Float_t m_genB2_phi;
   Float_t m_genB2_e;
+
+  Float_t m_genTau1_pt;
+  Float_t m_genTau1_eta;
+  Float_t m_genTau1_phi;
+  Float_t m_genTau1_e;
+  Float_t m_genTau2_pt;
+  Float_t m_genTau2_eta;
+  Float_t m_genTau2_phi;
+  Float_t m_genTau2_e;
 
   Float_t m_genNu1_pt;
   Float_t m_genNu1_eta;
