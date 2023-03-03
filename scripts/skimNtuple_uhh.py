@@ -177,9 +177,9 @@ if __name__ == "__main__":
         condorResubmitFile.write('Requirements = ( OpSysAndVer == "CentOS7" )\n')
         condorResubmitFile.write('+RequestRuntime = {}\n'.format(int(opt.runtime * 3600) - 1))
         condorResubmitFile.write('Executable = '+jobsDir + '/skimJob_$(miss).sh\n')
-        condorResubmitFile.write('Log = ' + jobsDir + '/resubmit_$(ClusterId)/condor_$(ClusterId).$(ProcId)_job_$(miss).log\n')
-        condorResubmitFile.write('Output = ' + jobsDir + '/resubmit_$(ClusterId)/condor_$(ClusterId).$(ProcId)_job_$(miss).out\n')
-        condorResubmitFile.write('Error = ' + jobsDir + '/resubmit_$(ClusterId)/condor_$(ClusterId).$(ProcId)_job_$(miss).error\n')
+        condorResubmitFile.write('Log = ' + jobsDir + '/condor_$(ClusterId).$(ProcId)_job_$(miss)_resubmit.log\n')
+        condorResubmitFile.write('Output = ' + jobsDir + '/condor_$(ClusterId).$(ProcId)_job_$(miss)_resubmit.out\n')
+        condorResubmitFile.write('Error = ' + jobsDir + '/condor_$(ClusterId).$(ProcId)_job_$(miss)_resubmit.error\n')
         condorResubmitFile.write('queue miss from ' + jobsDir + '/missing.txt')
         condorResubmitFile.close()
 
