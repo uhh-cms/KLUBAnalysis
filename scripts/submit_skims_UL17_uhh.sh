@@ -60,11 +60,17 @@ run_skim() {
         return "2"
     fi
 
+    echo "start submission for ${skimdir}"
+
+    # resubmission flag
+    local resub="none"
+    [ "${RESUBMIT}" != "0" ] && resub="run"
+
     # get additional arguments
     local args=${@:4}
 
     # build the command and run it
-    local comm="python ${KLUB_DIR}/scripts/skimNtuple_uhh.py -i ${file_list} -o ${SKIMDIR}/${OUTDIR}/${skimdir} -c ${KLUB_DIR}/config/skim_UL17_uhh.cfg -T ${OUTDIR} -s True -k True --pu ${PUDIR}/PU_UL2017_SF.txt ${args}"
+    local comm="python ${KLUB_DIR}/scripts/skimNtuple_uhh.py -i ${file_list} -o ${SKIMDIR}/${OUTDIR}/${skimdir} -c ${KLUB_DIR}/config/skim_UL17_uhh.cfg -T ${OUTDIR} -s True -k True --pu ${PUDIR}/PU_UL2017_SF.txt --resub ${resub} ${args}"
     [ "${DRYRUN}" != "0" ] && echo "${comm}" || eval "${comm}"
 }
 
@@ -188,6 +194,7 @@ run_skim "signal" "SKIM_VBF_Radion_m3000" "VBFToRadionToHHTo2B2Tau_M-3000_TuneCP
 ### SKIMS UL 2017, BACKGROUNDS ###
 ##################################
 
+# LO
 #run_skim "background" "SKIM_DY_incl"               "DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8"                         -x 6077.22 --DY True -g ${STITCHING_ON} -n 300 --rt 4
 #run_skim "background" "SKIM_DY_HT70to100"          "DYJetsToLL_M-50_HT-70to100_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8"               --DY True -g ${STITCHING_ON} -n 300 --rt 4
 #run_skim "background" "SKIM_DY_HT100to200"         "DYJetsToLL_M-50_HT-100to200_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8"              --DY True -g ${STITCHING_ON} -n 300 --rt 4
@@ -201,7 +208,6 @@ run_skim "signal" "SKIM_VBF_Radion_m3000" "VBFToRadionToHHTo2B2Tau_M-3000_TuneCP
 #run_skim "background" "SKIM_DY_2j"                 "DY2JetsToLL_M-50_MatchEWPDG20_TuneCP5_13TeV-madgraphMLM-pythia8"               --nj 2 --DY True -g ${STITCHING_ON} -n 300 --rt 4
 #run_skim "background" "SKIM_DY_3j"                 "DY3JetsToLL_M-50_MatchEWPDG20_TuneCP5_13TeV-madgraphMLM-pythia8"               --nj 3 --DY True -g ${STITCHING_ON} -n 300 --rt 4
 #run_skim "background" "SKIM_DY_4j"                 "DY4JetsToLL_M-50_MatchEWPDG20_TuneCP5_13TeV-madgraphMLM-pythia8"               --nj 4 --DY True -g ${STITCHING_ON} -n 300 --rt 4
-
 
 # NLO DY x-secs taken from XSDB and multiplied by k-factor from NLO to NNLO: 6077.22 [1] / 6404.0 [2]
 # [1] NNLO x-sec for inclusive DYJetsToLL_M-50 sample taken from https://twiki.cern.ch/twiki/bin/viewauth/CMS/StandardModelCrossSectionsat13TeV
