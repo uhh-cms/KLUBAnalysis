@@ -8,14 +8,14 @@ THIS_FILE="$( [ ! -z "$ZSH_VERSION" ] && echo "${(%):-%x}" || echo "${BASH_SOURC
 THIS_DIR="$( cd "$( dirname "$THIS_FILE" )" && pwd )"
 KLUB_DIR="$( cd "$( dirname "$THIS_DIR" )" && pwd )"
 
-OUTDIR="SKIMS_uhh_2017_v4_02Mar23"
+OUTDIR="SKIMS_uhh_2017_v4_07Jun23"
 INDIR="${KLUB_DIR}/inputFiles"
 PUDIR="/nfs/dust/cms/user/kramerto/hbt_static_files/KLUBAnalysis/weights/PUreweight/UL_Run2_PU_SF/2017"
 SKIMDIR="/nfs/dust/cms/user/$( whoami )/hbt_resonant_run2/HHSkims"
 
 DRYRUN="0"
 RESUBMIT="0"
-STITCHING_ON="1"
+STITCHING_ON="True"
 LIST_SCRIPT="scripts/makeListOnStorage_uhh.py"
 IN_TAG="uhh_2017_v4"
 
@@ -270,9 +270,9 @@ run_skim "background" "SKIM_ttHTobb"               "ttHTobb_M125_TuneCP5_13TeV-p
 run_skim "background" "SKIM_ttHToTauTau"           "ttHToTauTau_M125_TuneCP5_13TeV-powheg-pythia8"                                -x 0.5071 -y 0.0627              -n 30 --rt 4
 
 
-# ###########################
-# ### SKIMS UL 2017, DATA ###
-# ###########################
+###########################
+### SKIMS UL 2017, DATA ###
+###########################
 
 run_skim "data" "SKIM_SingleMuon_Run2017B" "SingleMuon__Run2017B" -d True -n 50 --rt 24
 run_skim "data" "SKIM_SingleMuon_Run2017C" "SingleMuon__Run2017C" -d True -n 50 --rt 24
