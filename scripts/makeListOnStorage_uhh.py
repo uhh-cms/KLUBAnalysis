@@ -1,146 +1,112 @@
 # coding: utf-8
 
+_all_ = [ 'make_input_lists' ]
+
 import os
+from os import path as op
 import sys
-import re
-import glob
-import fnmatch
+import warnings
+import argparse
+from argparse import ArgumentParser, RawTextHelpFormatter
 from subprocess import Popen, PIPE
 
+def create_dir(d):
+    if not op.exists(d):
+        os.makedirs(d)
+        
+def make_input_lists(args):
+    xrd_door = {'llr': 'root://eos.grif.fr/',
+                'uhh': 'root://dcache-cms-xrootd.desy.de:1094/',
+                'mib': '???'}[args.institute]
 
-thisdir = os.path.dirname(os.path.abspath(__file__))
+    store = {'llr': '/eos/grif/cms/llr/store/user/' + args.user + '/HHNtuples_res',
+             'uhh': '/pnfs/desy.de/cms/tier2/store/user/tokramer/hbt_resonant_run2/HHNtuples',
+             'mib': '???'}[args.institute]
+    # store    = op.join(store, args.data_period)
 
-dcache_mount = "/pnfs/desy.de/cms/tier2/store/user/{user}/hbt_resonant_run2/HHNtuples"
+    prefix   = args.kind
+    path     = op.join(store, args.tag)
 
-sample_kinds = {
-    "background": {"user": "tokramer", "campaign_cre": re.compile(r"^RunII[^\/]+$")},
-    "signal": {"user": "mrieger", "campaign_cre": re.compile(r"^RunII[^\/]+$")},
-    "data": {"user": "mrieger", "campaign_cre": re.compile(r"^Run201[^\/]+$")},
-}
+    leaf_dir = args.data_period + '_' + args.kind
+    this_dir = op.dirname(op.abspath(__file__))
+    out_dir  = op.normpath( op.join(op.dirname(this_dir), 'inputFiles', leaf_dir) )
+    create_dir(out_dir)
+    
+    rfdir  = 'ls -lH'
+    awk    = "| awk '{{print $9}}'"
+    rfcomm = lambda s : rfdir + ' {} '.format(s) + awk
+    print('Command run: {}'.format(rfcomm(path)))
+    pipeopt = dict(shell=True, stdout=PIPE)
+    pipe   = Popen(rfcomm(path), **pipeopt)
 
+    all_lists = {}
+    for smpl_name in pipe.stdout:
+        smpl_path = op.join(path, smpl_name).strip()
+        if args.sample not in smpl_name and args.sample != 'all':
+            continue
+        smpl_name = smpl_name.replace('\n', '')
+        all_lists[smpl_name] = []
 
-def print_err(*msg):
-    sys.stderr.write(" ".join(map(str, msg)) + "\n")
-    sys.stderr.flush()
+        for _ in range(2): #smpl_name, tag, hash subfolders
+            comm = rfcomm(smpl_path.strip())
+            out = Popen(comm, **pipeopt).stdout.readlines()
+            nlines = len(out)
+            if nlines > 0:
+                if nlines > 1:
+                    mes = 'In {} there are too many subfolder. '.format(smpl_path)
+                    mes += 'Using the last one (most recent submission).'
+                    warnings.warn(mes)   
+                smpl_path = op.join(smpl_path, out[-1].strip())
 
+        # loop over the folders 0000, 1000, etc...
+        comm = rfcomm(' {} '.format(smpl_path.strip()))
+        out = Popen(comm, **pipeopt).stdout.readlines()
+        for subfold in out:
+            final_dir = op.join(smpl_path, subfold.strip())
+            str_comm = '{} | grep HTauTauAnalysis'
+            file_comm = rfcomm( str_comm.format(final_dir.strip()) )
+            out = Popen(file_comm, **pipeopt).stdout.readlines()
+            for filename in out:
+                name = op.join(final_dir, filename.strip())
+                all_lists[smpl_name].append(name)
 
-def get_sample_info(sample_name, sample_kind, tag, campaign_pattern=None):
-    user = sample_kinds[sample_kind]["user"]
-    sample_dir = os.path.join(dcache_mount.format(user=user), tag, sample_name)
+    if len(all_lists.keys()) != 1: # currently calling this script once per sample
+        mes = 'Number of compatible files: {}'.format(len(all_lists.keys()))
+        raise RuntimeError(mes)
 
-    # get campaign names (the original ones, plus extensions)
-    campaign_names = []
-    for elem in os.listdir(sample_dir):
-        if sample_kinds[sample_kind]["campaign_cre"].match(elem):
-            campaign_names.append(elem)
-    if not campaign_names:
-        raise Exception("could not determine campaign_names for sample '{}'".format(sample_name))
-
-    # apply an additional campaign name filtering
-    if campaign_pattern:
-        campaign_names = [c for c in campaign_names if fnmatch.fnmatch(c, campaign_pattern)]
-        if not campaign_names:
-            raise Exception("no campaign found after applying pattern '{}'".format(campaign_pattern))
-
-    if sample_kind == "data":
-        # simply sort
-        campaign_names.sort()
-    else:
-        # sort such that the leading one is not a dataset extension (unless there are only extensions)
-        campaign_names.sort(key=lambda c: bool(re.match(r"^(.+)_ext\d+-v.+$", c)))
-
-    return sample_dir, campaign_names
-
-
-def get_sample_files(sample_name, sample_kind, tag, campaign_pattern=None, dry=False):
-    sample_dir, campaign_names = get_sample_info(sample_name, sample_kind, tag, campaign_pattern=campaign_pattern)
-
-    # complain when more than one campaign is found
-    if len(campaign_names) > 1:
-        msg = "found more than one campaign for sample {}: {}".format(sample_name, campaign_names)
-        if sample_kind == "data":
-            raise Exception(msg)
-        print_err(msg)
-
-    # get timestamps
-    timestamps = {}
-    for campaign_name in campaign_names:
-        campaign_dir = os.path.join(sample_dir, campaign_name)
-
-        # get the correct timestamp
-        _timestamps = [ts for ts in os.listdir(campaign_dir) if re.match(r"^\d+_\d+$", ts)]
-        if not _timestamps:
-            raise Exception("found no timestamp in campaign directory {}".format(campaign_dir))
-        if len(_timestamps) > 1:
-            print_err("found more than one timestamp in campaign directory {}, using latest one".format(campaign_dir))
-
-        # store it
-        timestamps[campaign_name] = sorted(_timestamps)[-1]
-
-    # create a list of file names
-    sample_files = []
-    xrd_door = ""  # "root://dcache-cms-xrootd.desy.de:1094/"
-    for campaign_name in campaign_names:
-        ts_dir = os.path.join(sample_dir, campaign_name, timestamps[campaign_name])
-        for file_name in glob.glob(os.path.join(ts_dir, "00??", "*.root")):
-            sample_files.append((xrd_door or "") + file_name)
-
-    return sample_files
-
-
-def print_sample_files(*args, **kwargs):
-    print("\n".join(get_sample_files(*args, **kwargs)))
-
-
-def write_sample_files(sample_name, sample_kind, tag, campaign_pattern=None, output_dir=None, dry=False):
-    """
-    For legacy support.
-    """
-    # default output dir
-    if output_dir is None:
-        output_dir = os.path.normpath(os.path.join(thisdir, "..", "inputFiles", "UL17_" + sample_kind))
-
-    # define the output file
-    campaign_names = get_sample_info(sample_name, sample_kind, tag, campaign_pattern=campaign_pattern)[1]
-    output_file = os.path.join(output_dir, "{}__{}.txt".format(sample_name, campaign_names[0]))
-
-    if not dry:
-        # get sample files
-        sample_files = get_sample_files(sample_name, sample_kind, tag, campaign_pattern=campaign_pattern)
-
-        # write them
-        if not os.path.exists(output_dir):
-            os.makedirs(output_dir)
-        with open(output_file, "w") as f:
-            f.write("\n".join(sample_files) + "\n")
-
-        print_err("found {} files for sample {}, campaigns {}, written to {}".format(
-            len(sample_files), sample_name, campaign_names, output_file))
-
-    # finally, print the output file
-    print(output_file)
-
+    if not all_lists:
+        mes = 'Sample {} was not found in {}.'.format(args.sample, path)
+        raise RuntimeError(mes)
+    
+    for sample, alist in all_lists.items():
+        if not alist: 
+            warnings.warn('Folder for dataset {} is empty'.format(sample))
+        else:
+            with open(op.join(out_dir, args.sample+'.txt'), 'w') as f:
+                for l in alist:
+                    f.write(l + '\n')
 
 if __name__ == "__main__":
-    from argparse import ArgumentParser
+    usage = 'Produces lists with input files for skim jobs. \n'
+    usage += 'Run example: `python scripts/makeListOnStorage.py -t Jul2022 --data_period UL18 -d 1`.'
+    parser = ArgumentParser(description=usage, formatter_class=RawTextHelpFormatter)
+    parser.add_argument('-t', '--tag', dest='tag', required=True, type=str,
+                        help='Tag used for the input big ntuples')
+    parser.add_argument('-d', '--data_period', dest='data_period', required=True, type=str,
+                        help='Which data period to choose: Legacy2018, UL18, ...')
+    parser.add_argument('-u', '--user', dest='user', required=True, type=str,
+                        help='User who produced the input data')
+    parser.add_argument('-x', '--institute', dest='institute', default='uhh',
+                        choices=('llr', 'uhh', 'mib'),
+                        required=False, type=str, help='Which set of machines to use: LLR, Hamburg or Milano.')
+    help_sample = ( 'For which sample to create the input list.\n' +
+                    'Passing "all" runs the macro over everything.' )
+    parser.add_argument('-s', '--sample', dest='sample',
+                        required=True, type=str,
+                        help=help_sample)
+    parser.add_argument('-k', '--kind', dest='kind', required=True, type=str,
+                        choices=('Data', 'Sig', 'MC'),
+                        help='Sample type.')
 
-    parser = ArgumentParser(description="prints input file lists for small ntuple production")
-    parser.add_argument("--sample", help="the sample to list files for")
-    parser.add_argument("--kind", choices=list(sample_kinds), help="the sample kind")
-    parser.add_argument("--campaign", default=None, help="an additional pattern for filtering campaigns, mandatory for data")
-    parser.add_argument("--tag", default="uhh_2017_v4", help="the big ntuple production tag")
-    parser.add_argument("--write", action="store_true", help="write the files names to file")
-    parser.add_argument("--dry", action="store_true", help="dry run")
-    args = parser.parse_args()
-
-    # get the function to call and prepare kwargs
-    func = print_sample_files
-    kwargs = {
-        "sample_name": args.sample, "sample_kind": args.kind, "campaign_pattern": args.campaign,
-        "tag": args.tag, "dry": args.dry,
-    }
-    if args.write:
-        func = write_sample_files
-
-    # call it
-    func(**kwargs)
+    FLAGS = parser.parse_args()
+    make_input_lists(FLAGS)
