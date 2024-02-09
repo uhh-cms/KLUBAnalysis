@@ -313,7 +313,7 @@ DATA_LIST=( "GluGluToRad" "GluGluToBulkGrav" "VBFToRad" "VBFToBulkGrav" )
 MASSES=("250" "260" "270" "280" "300" "320" "350" "400" "450" "500" "550" "600" "650" "700" "750" "800" "850" "900" "1000" "1250" "1500" "1750" "2000" "2500" "3000")
 for ds in ${DATA_LIST[@]}; do
 	for mass in ${MASSES[@]}; do
-		pattern="${ds}.+_M-${mass}";
+		pattern="${ds}.+_M-${mass}_";
 		sample=$(find_sample ${pattern} ${LIST_SIG_DIR} ${#LISTS_SIG[@]} ${LISTS_SIG[@]})
 		if [[ ${sample} =~ ${SEARCH_SPACE} ]]; then
 			ERRORS+=( ${sample} )
@@ -340,7 +340,7 @@ MC_MAP=(
     ["TTToSemiLeptonic"]="-n 100 -x ${SemiLepXSec} --rt 4"
 
     ["DYJets.+_M-50_T.+amc"]="-n 300 -x 6077.22 -g ${STITCHING_ON} --DY 0 --rt 4" # inclusive NLO
-    ["DYJets.+_M-10to50.+v2"]="-n 300 -x 20490.0 -g ${STITCHING_ON} --DY 0 --rt 4" # low mass
+    ["DYJets.+_M-10to50"]="-n 300 -x 20490.0 -g ${STITCHING_ON} --DY 0 --rt 4" # low mass
     ["DYJetsToLL_LHEFilterPtZ-0To50"]="-n 300    -x 1409.22 -g ${STITCHING_ON} --DY 0 --rt 4"
     ["DYJetsToLL_LHEFilterPtZ-50To100"]="-n 300  -x 377.12  -g ${STITCHING_ON} --DY 0 --rt 4"
     ["DYJetsToLL_LHEFilterPtZ-100To250"]="-n 300 -x 92.24   -g ${STITCHING_ON} --DY 0 --rt 4"
@@ -376,16 +376,16 @@ MC_MAP=(
     ["WminusHToTauTau"]="-n 30 -x 0.527 -y 0.06272 --rt 4"
     ["ZHToTauTau"]="-n 30 -x 0.880 -y 0.06272 --rt 4"
 
-    ["ZH_HToBB_ZToLL"]="-n 30 -x 0.880 -y ${ZH_HToBB_ZToLL_BR} --rt 4"
+    ["^ZH_HToBB_ZToLL"]="-n 30 -x 0.880 -y ${ZH_HToBB_ZToLL_BR} --rt 4"
     ["ZH_HToBB_ZToQQ"]="-n 30 -x 0.880 -y ${ZH_HToBB_ZToQQ_BR} --rt 4"
 
     ["ttHToNonbb"]="-n 100 -x 0.5071 -y 0.3598 -q short"
     ["ttHTobb"]="-n 100 -x 0.5071 -y 0.577 -q short"
     ["ttHToTauTau"]="-n 500 -x 0.5071 -y 0.0632 -q short"
 
-    ["WW_TuneCP5"]="-n 30 -x 118.7 -q short"
-    ["WZ_TuneCP5"]="-n 30 -x 47.13 -q short"
-    ["ZZ_TuneCP5"]="-n 30 -x 16.523 -q short"
+    ["^WW_TuneCP5"]="-n 30 -x 118.7 -q short"
+    ["^WZ_TuneCP5"]="-n 30 -x 47.13 -q short"
+    ["^ZZ_TuneCP5"]="-n 30 -x 16.523 -q short"
 
     ["WWW"]="-n 20 -x 0.209 --rt 4"
     ["WWZ"]="-n 20 -x 0.168 --rt 4"
@@ -403,7 +403,7 @@ MC_MAP=(
     ["TTWH"]="-n 20 -x 0.001143 --rt 4"
     ["TTZH"]="-n 20 -x 0.001136 --rt 4"
 
-	["GluGluToHHTo2B2Tau"]="-n 20 -x 0.01618 --rt 5"
+	["GluGluToHHTo2B2Tau_TuneCP5_PSWeights_node_SM"]="-n 20 -x 0.01618 --rt 5"
 )
 
 # Sanity checks for Drell-Yan stitching
