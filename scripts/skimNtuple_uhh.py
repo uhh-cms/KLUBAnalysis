@@ -86,7 +86,7 @@ def skim_ntuple(FLAGS, curr_folder):
     io_names = ( '{}.txt'.format(arg1),
                  'output_{}.root'.format(arg1),
                  '{}{}.log'.format(arg1,arg2) )
-    py_exec = os.path.join(os.path.dirname(os.path.dirname(FLAGS.config)), 'scripts', 'check_outputs.py')
+    py_exec = os.path.join(os.path.dirname(os.path.dirname(FLAGS.config)), 'scripts', 'check_outputs_uhh.py')
 
     if FLAGS.config == 'none':
         print('Config file missing, exiting')
