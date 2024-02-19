@@ -37,7 +37,7 @@ def remove_file(f):
 
 def parse_input_file_list(indir, insample):
     filelist = []
-    glob_pattern = '*' + insample + '*'
+    glob_pattern = insample + '*'
     sample = glob.glob( os.path.join(indir, glob_pattern) )
     if len(sample) != 1:
         mes = 'Exactly one file must be found, but {} were found.\n'.format(len(sample))

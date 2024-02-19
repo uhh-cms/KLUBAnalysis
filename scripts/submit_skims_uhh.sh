@@ -336,14 +336,14 @@ ZH_HToBB_ZToLL_BR=`echo "(0.033696 +0.033662 + 0.033632)*0.5824" | bc`
 
 MC_MAP=(
     ["TTToHadronic"]="-n 100 -x ${FullyHadXSec} --rt 4"
-    ["TTTo2L2Nu"]="-n 100 -x ${FullyLepXSec} --rt 4"
-    ["TTToSemiLeptonic"]="-n 100 -x ${SemiLepXSec} --rt 4"
+    ["TTTo2L2Nu"]="-n 100 -x ${FullyLepXSec} --rt 24"
+    ["TTToSemiLeptonic"]="-n 100 -x ${SemiLepXSec} --rt 24"
 
     ["DYJets.+_M-50_T.+amc"]="-n 300 -x 6077.22 -g ${STITCHING_ON} --DY 0 --rt 4" # inclusive NLO
-    ["DYJets.+_M-10to50"]="-n 300 -x 20490.0 -g ${STITCHING_ON} --DY 0 --rt 4" # low mass
-    ["DYJetsToLL_LHEFilterPtZ-0To50"]="-n 300    -x 1409.22 -g ${STITCHING_ON} --DY 0 --rt 4"
-    ["DYJetsToLL_LHEFilterPtZ-50To100"]="-n 300  -x 377.12  -g ${STITCHING_ON} --DY 0 --rt 4"
-    ["DYJetsToLL_LHEFilterPtZ-100To250"]="-n 300 -x 92.24   -g ${STITCHING_ON} --DY 0 --rt 4"
+    ["DYJets.+_M-10to50"]="-n 300 -x 20490.0 --DY 0 --rt 4" # low mass
+    ["DYJetsToLL_LHEFilterPtZ-0To50"]="-n 300    -x 1409.22 -g ${STITCHING_ON} --DY 0 --rt 24"
+    ["DYJetsToLL_LHEFilterPtZ-50To100"]="-n 300  -x 377.12  -g ${STITCHING_ON} --DY 0 --rt 24"
+    ["DYJetsToLL_LHEFilterPtZ-100To250"]="-n 300 -x 92.24   -g ${STITCHING_ON} --DY 0 --rt 24"
     ["DYJetsToLL_LHEFilterPtZ-250To400"]="-n 300 -x 3.512   -g ${STITCHING_ON} --DY 0 --rt 4" # some jobs are killed even with a single file (in the short queue)
     ["DYJetsToLL_LHEFilterPtZ-400To650"]="-n 300 -x 0.4826  -g ${STITCHING_ON} --DY 0 --rt 4"
     ["DYJetsToLL_LHEFilterPtZ-650ToInf"]="-n 300 -x 0.04487 -g ${STITCHING_ON} --DY 0 --rt 4"
@@ -394,8 +394,8 @@ MC_MAP=(
 
     ["TTWJetsToLNu"]="-n 20 -x 0.2043 --rt 4"
     ["TTWJetsToQQ"]="-n 20 -x 0.4062 --rt 4"
-    ["TTZToLLNuNu"]="-n 20 -x 0.2529 --rt 4"
-    ["TTZToQQ"]="-n 20 -x 0.5104 --rt 4"
+    ["TTZToLLNuNu"]="-n 20 -x 0.2529 --rt 24"
+    ["TTZToQQ"]="-n 20 -x 0.5104 --rt 24"
     ["TTWW"]="-n 20 -x 0.006979 --rt 4"
     ["TTZZ"]="-n 20 -x 0.001386 --rt 4"
     ["TTWZ"]="-n 20 -x 0.00158 --rt 4"
