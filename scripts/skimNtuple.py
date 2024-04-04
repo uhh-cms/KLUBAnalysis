@@ -43,6 +43,7 @@ def parse_input_file_list(indir, insample):
         mes = 'Exactly one file must be found, but {} were found.\n'.format(len(sample))
         mes += '  Input folder: {}.\n'.format(indir)
         mes += '  Pattern being searched: {}.\n'.format(glob_pattern)
+        mes += '  Samples found: {}.\n'.format(sample)
         raise ValueError(mes)
 
     with open(sample[0], 'r') as f:
@@ -226,7 +227,7 @@ def skim_ntuple(FLAGS, curr_folder):
                                        FLAGS.htcut,
                                        FLAGS.htcutlow,
                                        yes_or_no(FLAGS.toprew),
-                                       yes_or_no(FLAGS.genjets),
+                                       yes_or_no(FLAGS.dystitching),
                                        FLAGS.topstitch,
                                        yes_or_no(FLAGS.domt2),
                                        yes_or_no(FLAGS.ishhsignal),
@@ -324,8 +325,7 @@ if __name__ == "__main__":
     parser.add_argument('-e', '--njets', default='-999', help='njets required for stitching on inclusive')
     parser.add_argument('-t', '--toprew', default=0, type=int, help='is TT bar sample to compute reweight?')
     parser.add_argument('-b', '--topstitch', default='0', help='type of TT gen level decay pruning for stitch')
-    parser.add_argument('-g', '--genjets', default=0, type=int,
-                        help='loop on genjets to determine the number of b hadrons')
+    parser.add_argument('-g', '--dystitching', default=0, type=int, help='whether to use DY stitching or not.')
     parser.add_argument('-a', '--ishhsignal', default=0, type=int, help='isHHsignal')
     parser.add_argument('--BSMname', default='none', help='additional name for EFT benchmarks')
     parser.add_argument('--EFTbm', dest='EFTrew', default='none',

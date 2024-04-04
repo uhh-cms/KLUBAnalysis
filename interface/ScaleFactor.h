@@ -21,28 +21,25 @@ private:
   std::map<std::string, TGraphAsymmErrors *> eff_data;
   std::map<std::string, TGraphAsymmErrors *> eff_mc;
 
-  TH1D * etaBinsH;
+  TH1D *etaBinsH;
 
-  void  SetAxisBins(TGraphAsymmErrors*);
-  bool  check_SameBinning(TGraphAsymmErrors*, TGraphAsymmErrors*);
-  //std::string FindEtaLabel(double, std::string);
-  int FindPtBin( std::map<std::string, TGraphAsymmErrors *>, std::string, double);
+  void SetAxisBins(TGraphAsymmErrors*);
+  bool check_SameBinning(TGraphAsymmErrors*, TGraphAsymmErrors*);
+  std::string FindEtaLabel(double, std::string);
+  int FindPtBin(std::map<std::string, TGraphAsymmErrors *>, std::string, double, double, int);
 
 public:
   ScaleFactor(){};
-  void init_ScaleFactor(TString);
-  void init_ScaleFactor(TString,std::string);
+  ~ScaleFactor(){};
   void init_ScaleFactor(TString, std::string, bool);
   void init_EG_ScaleFactor(TString, bool);
-  ~ ScaleFactor(){};
-  std::string FindEtaLabel(double, std::string);
-  double get_EfficiencyData(double, double); //pt, eta
-  double get_EfficiencyMC(double, double);
-  double get_ScaleFactor(double, double);
-  double get_direct_ScaleFactor(double, double);
-  double get_EfficiencyDataError(double, double);
-  double get_EfficiencyMCError(double, double);
-  double get_ScaleFactorError(double, double);
+  double get_EfficiencyData(double, double, int); //pt, eta, pType
+  double get_EfficiencyMC(double, double, int);
+  double get_ScaleFactor(double, double, int);
+  double get_direct_ScaleFactor(double, double, int);
+  double get_EfficiencyDataError(double, double, int);
+  double get_EfficiencyMCError(double, double, int);
+  double get_ScaleFactorError(double, double, int);
 
 };
 
