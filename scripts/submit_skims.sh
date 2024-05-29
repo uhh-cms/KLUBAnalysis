@@ -100,10 +100,10 @@ elif [ ${DATA_PERIOD} == "UL17" ]; then
 	YEAR="2017"
 elif [ ${DATA_PERIOD} == "UL16" ]; then
 	PU_DIR="weights/PUreweight/UL_Run2_PU_SF/2016/PU_UL2016_SF.txt"
-	YEAR="2016preVFP"
+	YEAR="2016postVFP"
 elif [ ${DATA_PERIOD} == "UL16APV" ]; then
 	PU_DIR="weights/PUreweight/UL_Run2_PU_SF/2016APV/PU_UL2016APV_SF.txt"
-	YEAR="2016postVFP"
+	YEAR="2016preVFP"
 fi
 
 AYEAR=${YEAR:0:4}
@@ -285,7 +285,11 @@ LIST_SCRIPT="scripts/makeListOnStorage.py"
 LIST_DIR="root://eos.grif.fr//eos/grif/cms/llr/store/user/${DATA_USER}/"
 
 EXEC_FILE="${EXEC_FILE}/skimNtuple_HHbtag.exe"
-LIST_DIR=${LIST_DIR}"HHNtuples_res/"${DATA_PERIOD}"/"
+if [ ${DATA_PERIOD} == "UL16" ] || [ ${DATA_PERIOD} == "UL16APV" ]; then
+	LIST_DIR=${LIST_DIR}"HHNtuples_res/UL16/"
+else
+	LIST_DIR=${LIST_DIR}"HHNtuples_res/"${DATA_PERIOD}"/"
+fi
 
 ### Check if the voms command was run
 eval `scram unsetenv -sh` # unset CMSSW environment
