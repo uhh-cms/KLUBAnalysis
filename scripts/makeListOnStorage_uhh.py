@@ -1,19 +1,20 @@
 # coding: utf-8
 
-_all_ = [ 'make_input_lists' ]
-
-import os
-from os import path as op
-import sys
-import warnings
-import argparse
-from argparse import ArgumentParser, RawTextHelpFormatter
 from subprocess import Popen, PIPE
+from argparse import ArgumentParser, RawTextHelpFormatter
+import argparse
+import warnings
+import sys
+from os import path as op
+import os
+_all_ = ['make_input_lists']
+
 
 def create_dir(d):
     if not op.exists(d):
         os.makedirs(d)
-        
+
+
 def make_input_lists(args):
     xrd_door = {'llr': 'root://eos.grif.fr/',
                 'uhh': 'root://dcache-cms-xrootd.desy.de:1094/',
@@ -24,38 +25,40 @@ def make_input_lists(args):
              'mib': '???'}[args.institute]
     # store    = op.join(store, args.data_period)
 
-    prefix   = args.kind
-    path     = op.join(store, args.tag)
+    prefix = args.kind
+    path = op.join(store, args.tag)
 
     leaf_dir = args.data_period + '_' + args.kind
     this_dir = op.dirname(op.abspath(__file__))
-    out_dir  = op.normpath( op.join(op.dirname(this_dir), 'inputFiles', leaf_dir) )
+    out_dir = op.normpath(
+        op.join(op.dirname(this_dir), 'inputFiles', leaf_dir))
     create_dir(out_dir)
-    
-    rfdir  = 'ls -lH'
-    awk    = "| awk '{{print $9}}'"
-    rfcomm = lambda s : rfdir + ' {} '.format(s) + awk
+
+    rfdir = 'ls -lH'
+    awk = "| awk '{{print $9}}'"
+    def rfcomm(s): return rfdir + ' {} '.format(s) + awk
     print('Command run: {}'.format(rfcomm(path)))
     pipeopt = dict(shell=True, stdout=PIPE)
-    pipe   = Popen(rfcomm(path), **pipeopt)
+    pipe = Popen(rfcomm(path), **pipeopt)
 
     all_lists = {}
     for smpl_name in pipe.stdout:
         smpl_path = op.join(path, smpl_name).strip()
-        if args.sample not in smpl_name and args.sample != 'all':
+        if not smpl_name.startswith(args.sample) and args.sample != 'all':
             continue
         smpl_name = smpl_name.replace('\n', '')
         all_lists[smpl_name] = []
 
-        for _ in range(2): #smpl_name, tag, hash subfolders
+        for _ in range(2):  # smpl_name, tag, hash subfolders
             comm = rfcomm(smpl_path.strip())
             out = Popen(comm, **pipeopt).stdout.readlines()
             nlines = len(out)
             if nlines > 0:
                 if nlines > 1:
-                    mes = 'In {} there are too many subfolder. '.format(smpl_path)
+                    mes = 'In {} there are too many subfolder. '.format(
+                        smpl_path)
                     mes += 'Using the last one (most recent submission).'
-                    warnings.warn(mes)   
+                    warnings.warn(mes)
                 smpl_path = op.join(smpl_path, out[-1].strip())
 
         # loop over the folders 0000, 1000, etc...
@@ -64,32 +67,35 @@ def make_input_lists(args):
         for subfold in out:
             final_dir = op.join(smpl_path, subfold.strip())
             str_comm = '{} | grep HTauTauAnalysis'
-            file_comm = rfcomm( str_comm.format(final_dir.strip()) )
+            file_comm = rfcomm(str_comm.format(final_dir.strip()))
             out = Popen(file_comm, **pipeopt).stdout.readlines()
             for filename in out:
                 name = op.join(final_dir, filename.strip())
                 all_lists[smpl_name].append(name)
 
-    if len(all_lists.keys()) != 1: # currently calling this script once per sample
+    if len(all_lists.keys()) != 1:  # currently calling this script once per sample
         mes = 'Number of compatible files: {}'.format(len(all_lists.keys()))
+        print(all_lists.keys())
         raise RuntimeError(mes)
 
     if not all_lists:
         mes = 'Sample {} was not found in {}.'.format(args.sample, path)
         raise RuntimeError(mes)
-    
+
     for sample, alist in all_lists.items():
-        if not alist: 
+        if not alist:
             warnings.warn('Folder for dataset {} is empty'.format(sample))
         else:
-            with open(op.join(out_dir, args.sample+'.txt'), 'w') as f:
+            with open(op.join(out_dir, args.outtxt+'.txt'), 'w') as f:
                 for l in alist:
                     f.write(l + '\n')
+
 
 if __name__ == "__main__":
     usage = 'Produces lists with input files for skim jobs. \n'
     usage += 'Run example: `python scripts/makeListOnStorage.py -t Jul2022 --data_period UL18 -d 1`.'
-    parser = ArgumentParser(description=usage, formatter_class=RawTextHelpFormatter)
+    parser = ArgumentParser(
+        description=usage, formatter_class=RawTextHelpFormatter)
     parser.add_argument('-t', '--tag', dest='tag', required=True, type=str,
                         help='Tag used for the input big ntuples')
     parser.add_argument('-d', '--data_period', dest='data_period', required=True, type=str,
@@ -99,11 +105,13 @@ if __name__ == "__main__":
     parser.add_argument('-x', '--institute', dest='institute', default='uhh',
                         choices=('llr', 'uhh', 'mib'),
                         required=False, type=str, help='Which set of machines to use: LLR, Hamburg or Milano.')
-    help_sample = ( 'For which sample to create the input list.\n' +
-                    'Passing "all" runs the macro over everything.' )
+    help_sample = ('For which sample to create the input list.\n' +
+                   'Passing "all" runs the macro over everything.')
     parser.add_argument('-s', '--sample', dest='sample',
                         required=True, type=str,
                         help=help_sample)
+    parser.add_argument('-o', '--outtxt', required=True,
+                        type=str, help="Name of the txt output file.")
     parser.add_argument('-k', '--kind', dest='kind', required=True, type=str,
                         choices=('Data', 'Sig', 'MC'),
                         help='Sample type.')
