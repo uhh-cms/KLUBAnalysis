@@ -2864,6 +2864,7 @@ int main (int argc, char** argv)
 	
 	  if (isMC) {
 		if (pType == 0 or pType == 3) {
+		  // use absolute value of eta for muons, because the SFs are given from 0 to 2.4
 		  idSF_leg1 = myIDandISOScaleFactor[0]->get_ScaleFactor(leg1pt, fabs(leg1eta), pType) * myIDandISOScaleFactor[2]->get_ScaleFactor(leg1pt, fabs(leg1eta), pType);
 		}
 		else if (pType == 1 or pType == 4) {
@@ -2872,6 +2873,7 @@ int main (int argc, char** argv)
 	  }
 
 	  if(isMC and pType == 3) { //MuMu
+		// use absolute value of eta for muons, because the SFs are given from 0 to 2.4
 		idSF_leg2 = myIDandISOScaleFactor[0]->get_ScaleFactor(leg2pt, fabs(leg2eta), pType) * myIDandISOScaleFactor[2]->get_ScaleFactor(leg2pt, fabs(leg2eta), pType);
 	  }
 	  else if(isMC and pType == 4) { //EleEle
@@ -3123,29 +3125,33 @@ int main (int argc, char** argv)
 	  // https://github.com/truggles/TauTriggerSFs2017
 
 	  // recommendations for cross triggers:  https://twiki.cern.ch/twiki/bin/view/CMS/HiggsToTauTauWorking2017#Trigger_Information
-	  float trigSF					= -1.0;
-	  float trigSFnoMET				= -1.0;
-	  float trigSFnoTau				= -1.0;
-	  float trigSF_ele_up			= -1.0;
-	  float trigSF_mu_up			= -1.0;
-	  float trigSF_SL_mu_up			= -1.0;
-	  float trigSF_cross_mu_up		= -1.0;
-	  float trigSF_tau_DM0_up		= -1.0;
-	  float trigSF_tau_DM1_up		= -1.0;
-	  float trigSF_tau_DM10_up		= -1.0;
-	  float trigSF_tau_DM11_up		= -1.0;
-	  float trigSF_ele_down			= -1.0;
-	  float trigSF_mu_down			= -1.0;
-	  float trigSF_SL_mu_down		= -1.0;
-	  float trigSF_cross_mu_down	= -1.0;
-	  float trigSF_tau_DM0_down		= -1.0;
-	  float trigSF_tau_DM1_down		= -1.0;
-	  float trigSF_tau_DM10_down	= -1.0;
-	  float trigSF_tau_DM11_down	= -1.0;
-	  float trigSF_met_up			= -1.0;
-	  float trigSF_met_down			= -1.0;
-	  float trigSF_stau_up			= -1.0;
-	  float trigSF_stau_down		= -1.0;
+	  float trigSF                = -1.0;
+	  float trigSFnoMET           = -1.0;
+	  float trigSFnoTau           = -1.0;
+	  float trigSF_met_up         = -1.0;
+	  float trigSF_met_down       = -1.0;
+	  float trigSF_stau_up        = -1.0;
+	  float trigSF_stau_down      = -1.0;
+	  float trigSF_ele_up         = -1.0;
+	  float trigSF_SL_ele_up      = -1.0;
+	  float trigSF_cross_ele_up   = -1.0;
+	  float trigSF_ele_down       = -1.0;
+	  float trigSF_SL_ele_down    = -1.0;
+	  float trigSF_cross_ele_down = -1.0;
+	  float trigSF_mu_up          = -1.0;
+	  float trigSF_SL_mu_up       = -1.0;
+	  float trigSF_cross_mu_up    = -1.0;
+	  float trigSF_mu_down        = -1.0;
+	  float trigSF_SL_mu_down     = -1.0;
+	  float trigSF_cross_mu_down  = -1.0;
+	  float trigSF_tau_DM0_up     = -1.0;
+	  float trigSF_tau_DM1_up     = -1.0;
+	  float trigSF_tau_DM10_up    = -1.0;
+	  float trigSF_tau_DM11_up    = -1.0;
+	  float trigSF_tau_DM0_down   = -1.0;
+	  float trigSF_tau_DM1_down   = -1.0;
+	  float trigSF_tau_DM10_down  = -1.0;
+	  float trigSF_tau_DM11_down  = -1.0;
 	  
 	  if(applyTriggers)
 		{
@@ -3154,56 +3160,64 @@ int main (int argc, char** argv)
 			{
 			  if (trgRegions["met"])
 				{
-				  trigSF           = metSF.getSF(vMETnoMu.Mod());
-				  trigSFnoMET      = 1.;
-				  trigSFnoTau      = trigSF;
-				  trigSF_met_up    = trigSF + metSF.getSFError(vMETnoMu.Mod());
-				  trigSF_met_down  = trigSF - metSF.getSFError(vMETnoMu.Mod());
-				  trigSF_stau_up   = trigSF;
-				  trigSF_stau_down = trigSF;
-				  trigSF_tau_DM0_up	   = trigSF; 
-				  trigSF_tau_DM1_up	   = trigSF; 
-				  trigSF_tau_DM10_up   = trigSF; 
-				  trigSF_tau_DM11_up   = trigSF; 
-				  trigSF_tau_DM0_down  = trigSF; 
-				  trigSF_tau_DM1_down  = trigSF; 
-				  trigSF_tau_DM10_down = trigSF; 
-				  trigSF_tau_DM11_down = trigSF;
-				  trigSF_ele_up	  = trigSF;
-				  trigSF_ele_down = trigSF;
-				  trigSF_mu_up	  = trigSF;
-				  trigSF_mu_down  = trigSF;
-				  trigSF_SL_mu_up = trigSF;
-				  trigSF_SL_mu_down = trigSF;
-				  trigSF_cross_mu_up = trigSF;
-				  trigSF_cross_mu_down = trigSF;
+				  trigSF                = metSF.getSF(vMETnoMu.Mod());
+				  trigSFnoMET           = 1.;
+				  trigSFnoTau           = trigSF;
+				  trigSF_met_up         = trigSF + metSF.getSFError(vMETnoMu.Mod());
+				  trigSF_met_down       = trigSF - metSF.getSFError(vMETnoMu.Mod());
+				  trigSF_stau_up        = trigSF;
+				  trigSF_stau_down      = trigSF;
+				  trigSF_ele_up         = trigSF;
+				  trigSF_SL_ele_up      = trigSF;
+				  trigSF_cross_ele_up   = trigSF;
+				  trigSF_ele_down       = trigSF;
+				  trigSF_SL_ele_down    = trigSF;
+				  trigSF_cross_ele_down = trigSF;
+				  trigSF_mu_up          = trigSF;
+				  trigSF_SL_mu_up       = trigSF;
+				  trigSF_cross_mu_up    = trigSF;
+				  trigSF_mu_down        = trigSF;
+				  trigSF_SL_mu_down     = trigSF;
+				  trigSF_cross_mu_down  = trigSF;
+				  trigSF_tau_DM0_up     = trigSF;
+				  trigSF_tau_DM1_up     = trigSF;
+				  trigSF_tau_DM10_up    = trigSF;
+				  trigSF_tau_DM11_up    = trigSF;
+				  trigSF_tau_DM0_down   = trigSF;
+				  trigSF_tau_DM1_down   = trigSF;
+				  trigSF_tau_DM10_down  = trigSF;
+				  trigSF_tau_DM11_down  = trigSF;
 				}
 
 			  else if (trgRegions["tau"])
 				{
-				  trigSF           = singleTauSF[PERIOD].first;
-				  trigSFnoMET      = trigSF;
-				  trigSFnoTau      = 1.;
-				  trigSF_stau_up   = trigSF + singleTauSF[PERIOD].second;
-				  trigSF_stau_down = trigSF - singleTauSF[PERIOD].second;
-				  trigSF_met_up    = trigSF;
-				  trigSF_met_down  = trigSF;
-				  trigSF_tau_DM0_up	   = trigSF; 
-				  trigSF_tau_DM1_up	   = trigSF; 
-				  trigSF_tau_DM10_up   = trigSF; 
-				  trigSF_tau_DM11_up   = trigSF; 
-				  trigSF_tau_DM0_down  = trigSF; 
-				  trigSF_tau_DM1_down  = trigSF; 
-				  trigSF_tau_DM10_down = trigSF; 
-				  trigSF_tau_DM11_down = trigSF; 
-				  trigSF_ele_up	  = trigSF;
-				  trigSF_ele_down = trigSF;
-				  trigSF_mu_up	  = trigSF;
-				  trigSF_mu_down  = trigSF;
-				  trigSF_SL_mu_up = trigSF;
-				  trigSF_SL_mu_down = trigSF;
-				  trigSF_cross_mu_up = trigSF;
-				  trigSF_cross_mu_down = trigSF;
+				  trigSF                = singleTauSF[PERIOD].first;
+				  trigSFnoMET           = trigSF;
+				  trigSFnoTau           = 1.;
+				  trigSF_met_up         = trigSF;
+				  trigSF_met_down       = trigSF;
+				  trigSF_stau_up        = trigSF + singleTauSF[PERIOD].second;
+				  trigSF_stau_down      = trigSF - singleTauSF[PERIOD].second;
+				  trigSF_ele_up         = trigSF;
+				  trigSF_SL_ele_up      = trigSF;
+				  trigSF_cross_ele_up   = trigSF;
+				  trigSF_ele_down       = trigSF;
+				  trigSF_SL_ele_down    = trigSF;
+				  trigSF_cross_ele_down = trigSF;
+				  trigSF_mu_up          = trigSF;
+				  trigSF_SL_mu_up       = trigSF;
+				  trigSF_cross_mu_up    = trigSF;
+				  trigSF_mu_down        = trigSF;
+				  trigSF_SL_mu_down     = trigSF;
+				  trigSF_cross_mu_down  = trigSF;
+				  trigSF_tau_DM0_up     = trigSF;
+				  trigSF_tau_DM1_up     = trigSF;
+				  trigSF_tau_DM10_up    = trigSF;
+				  trigSF_tau_DM11_up    = trigSF;
+				  trigSF_tau_DM0_down   = trigSF;
+				  trigSF_tau_DM1_down   = trigSF;
+				  trigSF_tau_DM10_down  = trigSF;
+				  trigSF_tau_DM11_down  = trigSF;
 				}
 
 			  // eta region covered both by cross-trigger and single lepton trigger
@@ -3217,58 +3231,69 @@ int main (int argc, char** argv)
 				  if (tlv_secondLepton.Pt() < lep2_thresh) passCross  = 0;
 
 				  // lepton trigger
-				  double SFL_Data = 1., SFL_MC = 1., SFL_Data_Err = 0., SFL_MC_Err = 0.;
+				  double Eff_SL_mu_Data = 1., Eff_SL_mu_MC = 1., Eff_SL_mu_Data_Err = 0., Eff_SL_mu_MC_Err = 0.;
 				  if (passSingle) {
-					SFL_Data = muTrgSF->get_EfficiencyData(tlv_firstLepton.Pt(), fabs(tlv_firstLepton.Eta()), pType);
-					SFL_MC   = muTrgSF->get_EfficiencyMC(  tlv_firstLepton.Pt(), fabs(tlv_firstLepton.Eta()), pType);
-					SFL_Data_Err = muTrgSF->get_EfficiencyDataError(tlv_firstLepton.Pt(), fabs(tlv_firstLepton.Eta()), pType);
-					SFL_MC_Err   = muTrgSF->get_EfficiencyMCError(  tlv_firstLepton.Pt(), fabs(tlv_firstLepton.Eta()), pType);
+					// use absolute value of eta for muons, because the SFs are given from 0 to 2.4
+					Eff_SL_mu_Data = muTrgSF->get_EfficiencyData(tlv_firstLepton.Pt(), fabs(tlv_firstLepton.Eta()), pType);
+					Eff_SL_mu_MC   = muTrgSF->get_EfficiencyMC(  tlv_firstLepton.Pt(), fabs(tlv_firstLepton.Eta()), pType);
+					Eff_SL_mu_Data_Err = muTrgSF->get_EfficiencyDataError(tlv_firstLepton.Pt(), fabs(tlv_firstLepton.Eta()), pType);
+					Eff_SL_mu_MC_Err   = muTrgSF->get_EfficiencyMCError(  tlv_firstLepton.Pt(), fabs(tlv_firstLepton.Eta()), pType);
 				  }
 
 				  //cross-trigger
 				  //mu leg
-				  double SFl_Data = 1., SFl_MC = 1., SFl_Data_Err = 0., SFl_MC_Err = 0.;
+				  double Eff_cross_mu_Data = 1., Eff_cross_mu_MC = 1., Eff_cross_mu_Data_Err = 0., Eff_cross_mu_MC_Err = 0.;
 				  if (passCross) {
-					SFl_Data = muTauTrgSF->get_EfficiencyData(tlv_firstLepton.Pt(), fabs(tlv_firstLepton.Eta()), pType);
-					SFl_MC   = muTauTrgSF->get_EfficiencyMC(  tlv_firstLepton.Pt(), fabs(tlv_firstLepton.Eta()), pType);
-					SFl_Data_Err = muTauTrgSF->get_EfficiencyDataError(tlv_firstLepton.Pt(), fabs(tlv_firstLepton.Eta()), pType);
-					SFl_MC_Err   = muTauTrgSF->get_EfficiencyMCError(  tlv_firstLepton.Pt(), fabs(tlv_firstLepton.Eta()), pType);
+					// use absolute value of eta for muons, because the SFs are given from 0 to 2.4
+					Eff_cross_mu_Data = muTauTrgSF->get_EfficiencyData(tlv_firstLepton.Pt(), fabs(tlv_firstLepton.Eta()), pType);
+					Eff_cross_mu_MC   = muTauTrgSF->get_EfficiencyMC(  tlv_firstLepton.Pt(), fabs(tlv_firstLepton.Eta()), pType);
+					Eff_cross_mu_Data_Err = muTauTrgSF->get_EfficiencyDataError(tlv_firstLepton.Pt(), fabs(tlv_firstLepton.Eta()), pType);
+					Eff_cross_mu_MC_Err   = muTauTrgSF->get_EfficiencyMCError(  tlv_firstLepton.Pt(), fabs(tlv_firstLepton.Eta()), pType);
 				  }
 
 				  //tau leg
-				  double SFtau_Data = tauTrgSF_mutau->getEfficiencyData(tlv_secondLepton.Pt(), DM2, 0); // last entry is uncertainty: 0 central, +1 up, -1 down
-				  double SFtau_MC   = tauTrgSF_mutau->getEfficiencyMC  (tlv_secondLepton.Pt(), DM2, 0); // last entry is uncertainty: 0 central, +1 up, -1 down
+				  double Eff_cross_tau_Data = tauTrgSF_mutau->getEfficiencyData(tlv_secondLepton.Pt(), DM2, 0); // last entry is uncertainty: 0 central, +1 up, -1 down
+				  double Eff_cross_tau_MC   = tauTrgSF_mutau->getEfficiencyMC  (tlv_secondLepton.Pt(), DM2, 0); // last entry is uncertainty: 0 central, +1 up, -1 down
 
 				  // Compute efficiencies
-				  double Eff_Data = passSingle * SFL_Data - passCross * passSingle * std::min(SFl_Data, SFL_Data) * SFtau_Data + passCross * SFl_Data * SFtau_Data;
-				  double Eff_MC   = passSingle * SFL_MC   - passCross * passSingle * std::min(SFl_MC  , SFL_MC)   * SFtau_MC   + passCross * SFl_MC   * SFtau_MC;
+				  double Eff_Data = passSingle * Eff_SL_mu_Data - passCross * passSingle * std::min(Eff_cross_mu_Data, Eff_SL_mu_Data) * Eff_cross_tau_Data + passCross * Eff_cross_mu_Data * Eff_cross_tau_Data;
+				  double Eff_MC   = passSingle * Eff_SL_mu_MC   - passCross * passSingle * std::min(Eff_cross_mu_MC  , Eff_SL_mu_MC)   * Eff_cross_tau_MC   + passCross * Eff_cross_mu_MC   * Eff_cross_tau_MC;
 
 				  // Compute uncertainties (separate for SingleMuon and mu leg of cross trigger)
-				  double Err_Data_SL_mu = passSingle * SFL_Data_Err - passCross * passSingle * (SFl_Data > SFL_Data) * SFL_Data_Err * SFtau_Data;
-				  double Err_MC_SL_mu   = passSingle * SFL_MC_Err   - passCross * passSingle * (SFl_MC   > SFL_MC)   * SFL_MC_Err   * SFtau_MC;
+				  double Err_Data_SL_mu = passSingle * Eff_SL_mu_Data_Err - passCross * passSingle * (Eff_cross_mu_Data > Eff_SL_mu_Data) * Eff_SL_mu_Data_Err * Eff_cross_tau_Data;
+				  double Err_MC_SL_mu   = passSingle * Eff_SL_mu_MC_Err   - passCross * passSingle * (Eff_cross_mu_MC   > Eff_SL_mu_MC)   * Eff_SL_mu_MC_Err   * Eff_cross_tau_MC;
 
-				  double trigSF_SL_mu_err = 0;
-				  if(passSingle) trigSF_SL_mu_err = muTrgSF->get_ScaleFactorError(Eff_Data, Eff_MC, Err_Data_SL_mu, Err_MC_SL_mu);
+				  double trigSF_SL_mu_err = 0.;
+				  if(passSingle) {
+					trigSF_SL_mu_err = muTrgSF->get_ScaleFactorError(Eff_Data, Eff_MC, Err_Data_SL_mu, Err_MC_SL_mu);
+				  }
 
-				  double Err_Data_cross_mu = - passCross * passSingle * (SFl_Data < SFL_Data) * SFl_Data_Err * SFtau_Data + passCross * SFl_Data_Err * SFtau_Data;
-				  double Err_MC_cross_mu   = - passCross * passSingle * (SFl_MC   < SFL_MC)   * SFl_MC_Err   * SFtau_MC   + passCross * SFl_MC_Err   * SFtau_MC;
+				  double Err_Data_cross_mu = - passCross * passSingle * (Eff_cross_mu_Data <= Eff_SL_mu_Data) * Eff_cross_mu_Data_Err * Eff_cross_tau_Data + passCross * Eff_cross_mu_Data_Err * Eff_cross_tau_Data;
+				  double Err_MC_cross_mu   = - passCross * passSingle * (Eff_cross_mu_MC   <= Eff_SL_mu_MC)   * Eff_cross_mu_MC_Err   * Eff_cross_tau_MC   + passCross * Eff_cross_mu_MC_Err   * Eff_cross_tau_MC;
 
-				  double trigSF_cross_mu_err = 0;
-				  if(passCross && !(passSingle && (SFl_Data < SFL_Data))) trigSF_cross_mu_err = muTrgSF->get_ScaleFactorError(Eff_Data, Eff_MC, Err_Data_cross_mu, Err_MC_cross_mu);
+				  double trigSF_cross_mu_err = 0.;
+
+				  // if single lepton trigger and cross trigger are passed and the cross trigger is less efficient than
+				  // the single lepton trigger, the "combined" efficiency reduces to the single lepton trigger efficiency
+				  // and the uncertainty on the cross trigger leg is 0, if this is the case in both Data and MC also the
+				  // uncertaintiy on the trigger scale factor is 0
+				  if(passCross and !(passSingle and (Eff_cross_mu_Data <= Eff_SL_mu_Data or Eff_cross_mu_MC <= Eff_SL_mu_MC))) {
+					trigSF_cross_mu_err = muTrgSF->get_ScaleFactorError(Eff_Data, Eff_MC, Err_Data_cross_mu, Err_MC_cross_mu);
+				  }
 
 				  double Err_Data_mu = Err_Data_SL_mu + Err_Data_cross_mu;
 				  double Err_MC_mu   = Err_MC_SL_mu   + Err_MC_cross_mu;
 				  double trigSF_mu_err   = muTrgSF->get_ScaleFactorError(Eff_Data, Eff_MC, Err_Data_mu, Err_MC_mu);
 
 				  // for each DM, get the trigSF error if the tauh has the corresponding DM (and the cross trigger thresholds are passed), otherwise 0
-				  vector <double> trigSF_err    (N_tauhDM, 0);
-				  if(passCross && ((SFl_Data > SFL_Data) || (SFl_MC > SFL_MC))){
+				  vector <double> trigSF_err    (N_tauhDM, 0.);
+				  if(passCross and ((Eff_cross_mu_Data > Eff_SL_mu_Data) or (Eff_cross_mu_MC > Eff_SL_mu_MC))){
 					for (int idm  = 0; idm < N_tauhDM; idm ++){
 						if (isthisDM_second[idm]){
-							double SFtau_Data_Up = tauTrgSF_mutau->getEfficiencyData(tlv_secondLepton.Pt(), DM2, 1);
-							double SFtau_MC_Up   = tauTrgSF_mutau->getEfficiencyMC  (tlv_secondLepton.Pt(), DM2, 1);
-							double Eff_Data_Up = passSingle * SFL_Data - passCross * passSingle * std::min(SFl_Data, SFL_Data) * SFtau_Data_Up   + passCross * SFl_Data * SFtau_Data_Up;
-							double Eff_MC_Up   = passSingle * SFL_MC   - passCross * passSingle * std::min(SFl_MC  , SFL_MC)   * SFtau_MC_Up     + passCross * SFl_MC   * SFtau_MC_Up;
+							double Eff_cross_tau_Data_Up = tauTrgSF_mutau->getEfficiencyData(tlv_secondLepton.Pt(), DM2, 1);
+							double Eff_cross_tau_MC_Up   = tauTrgSF_mutau->getEfficiencyMC  (tlv_secondLepton.Pt(), DM2, 1);
+							double Eff_Data_Up = passSingle * Eff_SL_mu_Data - passCross * passSingle * std::min(Eff_cross_mu_Data, Eff_SL_mu_Data) * Eff_cross_tau_Data_Up   + passCross * Eff_cross_mu_Data * Eff_cross_tau_Data_Up;
+							double Eff_MC_Up   = passSingle * Eff_SL_mu_MC   - passCross * passSingle * std::min(Eff_cross_mu_MC  , Eff_SL_mu_MC)   * Eff_cross_tau_MC_Up     + passCross * Eff_cross_mu_MC   * Eff_cross_tau_MC_Up;
 							trigSF_err[idm] = muTrgSF->get_ScaleFactorError(Eff_Data, Eff_MC, Eff_Data_Up - Eff_Data, Eff_MC_Up - Eff_MC);
 						}
 					}
@@ -3277,35 +3302,41 @@ int main (int argc, char** argv)
 				  if(DEBUG)
 					{
 					  cout << "--- DEBUG Trigger weights --- " << endl;
-					  cout << "SFL_Data: "   << SFL_Data   << endl;
-					  cout << "SFL_MC: "     << SFL_MC     << endl;
-					  cout << "SFl_Data: "   << SFl_Data   << endl;
-					  cout << "SFl_MC: "     << SFl_MC     << endl;
-					  cout << "SFtau_Data: " << SFtau_Data << endl;
-					  cout << "SFtau_MC: "   << SFtau_MC   << endl;
+					  cout << "Eff_SL_mu_Data: "   << Eff_SL_mu_Data   << endl;
+					  cout << "Eff_SL_mu_MC: "     << Eff_SL_mu_MC     << endl;
+					  cout << "Eff_cross_mu_Data: "   << Eff_cross_mu_Data   << endl;
+					  cout << "Eff_cross_mu_MC: "     << Eff_cross_mu_MC     << endl;
+					  cout << "Eff_cross_tau_Data: " << Eff_cross_tau_Data << endl;
+					  cout << "Eff_cross_tau_MC: "   << Eff_cross_tau_MC   << endl;
 					}
 
 				  trigSF                = muTrgSF->get_ScaleFactor(Eff_Data, Eff_MC);
 				  trigSFnoMET           = trigSF;
 				  trigSFnoTau           = trigSF;
-				  trigSF_mu_up          = trigSF + trigSF_mu_err;
-				  trigSF_mu_down        = trigSF - trigSF_mu_err;
-				  trigSF_SL_mu_up       = trigSF + trigSF_SL_mu_err;
-				  trigSF_SL_mu_down     = trigSF - trigSF_SL_mu_err;
-				  trigSF_cross_mu_up    = trigSF + trigSF_cross_mu_err;
-				  trigSF_cross_mu_down  = trigSF - trigSF_cross_mu_err;
-				  trigSF_tau_DM0_up     = trigSF + trigSF_err[0];
-				  trigSF_tau_DM0_down   = trigSF - trigSF_err[0];
-				  trigSF_tau_DM1_up     = trigSF + trigSF_err[1];
-				  trigSF_tau_DM1_down   = trigSF - trigSF_err[1];
-				  trigSF_tau_DM10_up    = trigSF + trigSF_err[2];
-				  trigSF_tau_DM10_down  = trigSF - trigSF_err[2];
-				  trigSF_tau_DM11_up    = trigSF + trigSF_err[3];
-				  trigSF_tau_DM11_down  = trigSF - trigSF_err[3];
 				  trigSF_met_up         = trigSF;
 				  trigSF_met_down       = trigSF;
 				  trigSF_stau_up        = trigSF;
 				  trigSF_stau_down      = trigSF;
+				  trigSF_ele_up         = trigSF;
+				  trigSF_SL_ele_up      = trigSF;
+				  trigSF_cross_ele_up   = trigSF;
+				  trigSF_ele_down       = trigSF;
+				  trigSF_SL_ele_down    = trigSF;
+				  trigSF_cross_ele_down = trigSF;
+				  trigSF_mu_up          = trigSF + trigSF_mu_err;
+				  trigSF_SL_mu_up       = trigSF + trigSF_SL_mu_err;
+				  trigSF_cross_mu_up    = trigSF + trigSF_cross_mu_err;
+				  trigSF_mu_down        = trigSF - trigSF_mu_err;
+				  trigSF_SL_mu_down     = trigSF - trigSF_SL_mu_err;
+				  trigSF_cross_mu_down  = trigSF - trigSF_cross_mu_err;
+				  trigSF_tau_DM0_up     = trigSF + trigSF_err[0];
+				  trigSF_tau_DM1_up     = trigSF + trigSF_err[1];
+				  trigSF_tau_DM10_up    = trigSF + trigSF_err[2];
+				  trigSF_tau_DM11_up    = trigSF + trigSF_err[3];
+				  trigSF_tau_DM0_down   = trigSF - trigSF_err[0];
+				  trigSF_tau_DM1_down   = trigSF - trigSF_err[1];
+				  trigSF_tau_DM10_down  = trigSF - trigSF_err[2];
+				  trigSF_tau_DM11_down  = trigSF - trigSF_err[3];
 				}
 			  else // eta region covered only by single lepton trigger
 				{
@@ -3319,33 +3350,38 @@ int main (int argc, char** argv)
 						 << " The weight will be set to one." << endl;
 				  }
 				  else {
+					// use absolute value of eta for muons, because the SFs are given from 0 to 2.4
 					SF     = muTrgSF->get_ScaleFactor(tlv_firstLepton.Pt(),      fabs(tlv_firstLepton.Eta()), pType);
 					SF_Err = muTrgSF->get_ScaleFactorError(tlv_firstLepton.Pt(), fabs(tlv_firstLepton.Eta()), pType);
 				  }
 				  
-				  trigSF               = SF;
-				  trigSFnoMET          = trigSF;
-				  trigSFnoTau          = trigSF;
-				  trigSF_mu_up         = SF + 1. * SF_Err;
-				  trigSF_mu_down       = SF - 1. * SF_Err;
-				  trigSF_SL_mu_up      = trigSF_mu_up;
-				  trigSF_SL_mu_down    = trigSF_mu_down;
-				  trigSF_cross_mu_up   = trigSF;
-				  trigSF_cross_mu_down = trigSF;
-				  trigSF_ele_up	       = trigSF;
-				  trigSF_ele_down      = trigSF;
-				  trigSF_met_up        = trigSF;
-				  trigSF_met_down      = trigSF;
-				  trigSF_stau_up       = trigSF;
-				  trigSF_stau_down     = trigSF;
-				  trigSF_tau_DM0_up	   = trigSF; 
-				  trigSF_tau_DM1_up	   = trigSF; 
-				  trigSF_tau_DM10_up   = trigSF; 
-				  trigSF_tau_DM11_up   = trigSF; 
-				  trigSF_tau_DM0_down  = trigSF; 
-				  trigSF_tau_DM1_down  = trigSF; 
-				  trigSF_tau_DM10_down = trigSF; 
-				  trigSF_tau_DM11_down = trigSF; 
+				  trigSF                = SF;
+				  trigSFnoMET           = trigSF;
+				  trigSFnoTau           = trigSF;
+				  trigSF_met_up         = trigSF;
+				  trigSF_met_down       = trigSF;
+				  trigSF_stau_up        = trigSF;
+				  trigSF_stau_down      = trigSF;
+				  trigSF_ele_up         = trigSF;
+				  trigSF_SL_ele_up      = trigSF;
+				  trigSF_cross_ele_up   = trigSF;
+				  trigSF_ele_down       = trigSF;
+				  trigSF_SL_ele_down    = trigSF;
+				  trigSF_cross_ele_down = trigSF;
+				  trigSF_mu_up          = SF + 1. * SF_Err;
+				  trigSF_SL_mu_up       = trigSF_mu_up;
+				  trigSF_cross_mu_up    = trigSF;
+				  trigSF_mu_down        = SF - 1. * SF_Err;
+				  trigSF_SL_mu_down     = trigSF_mu_down;
+				  trigSF_cross_mu_down  = trigSF;
+				  trigSF_tau_DM0_up     = trigSF;
+				  trigSF_tau_DM1_up     = trigSF;
+				  trigSF_tau_DM10_up    = trigSF;
+				  trigSF_tau_DM11_up    = trigSF;
+				  trigSF_tau_DM0_down   = trigSF;
+				  trigSF_tau_DM1_down   = trigSF;
+				  trigSF_tau_DM10_down  = trigSF;
+				  trigSF_tau_DM11_down  = trigSF;
 				}
 			}
 
@@ -3354,56 +3390,64 @@ int main (int argc, char** argv)
 			{
 			  if (trgRegions["met"])
 				{
-				  trigSF               = metSF.getSF(vMETnoMu.Mod());
-				  trigSFnoMET          = 1.;
-				  trigSFnoTau          = trigSF;
-				  trigSF_met_up        = trigSF + metSF.getSFError(vMETnoMu.Mod());
-				  trigSF_met_down      = trigSF - metSF.getSFError(vMETnoMu.Mod());
-				  trigSF_stau_up       = trigSF;
-				  trigSF_stau_down     = trigSF;
-				  trigSF_tau_DM0_up	   = trigSF; 
-				  trigSF_tau_DM1_up	   = trigSF; 
-				  trigSF_tau_DM10_up   = trigSF; 
-				  trigSF_tau_DM11_up   = trigSF; 
-				  trigSF_tau_DM0_down  = trigSF; 
-				  trigSF_tau_DM1_down  = trigSF; 
-				  trigSF_tau_DM10_down = trigSF; 
-				  trigSF_tau_DM11_down = trigSF; 
-				  trigSF_ele_up	       = trigSF;
-				  trigSF_ele_down      = trigSF;
-				  trigSF_mu_up	       = trigSF;
-				  trigSF_mu_down       = trigSF;
-				  trigSF_SL_mu_up      = trigSF;
-				  trigSF_SL_mu_down    = trigSF;
-				  trigSF_cross_mu_up   = trigSF;
-				  trigSF_cross_mu_down = trigSF;
+				  trigSF                = metSF.getSF(vMETnoMu.Mod());
+				  trigSFnoMET           = 1.;
+				  trigSFnoTau           = trigSF;
+				  trigSF_met_up         = trigSF + metSF.getSFError(vMETnoMu.Mod());
+				  trigSF_met_down       = trigSF - metSF.getSFError(vMETnoMu.Mod());
+				  trigSF_stau_up        = trigSF;
+				  trigSF_stau_down      = trigSF;
+				  trigSF_ele_up         = trigSF;
+				  trigSF_SL_ele_up      = trigSF;
+				  trigSF_cross_ele_up   = trigSF;
+				  trigSF_ele_down       = trigSF;
+				  trigSF_SL_ele_down    = trigSF;
+				  trigSF_cross_ele_down = trigSF;
+				  trigSF_mu_up          = trigSF;
+				  trigSF_SL_mu_up       = trigSF;
+				  trigSF_cross_mu_up    = trigSF;
+				  trigSF_mu_down        = trigSF;
+				  trigSF_SL_mu_down     = trigSF;
+				  trigSF_cross_mu_down  = trigSF;
+				  trigSF_tau_DM0_up     = trigSF;
+				  trigSF_tau_DM1_up     = trigSF;
+				  trigSF_tau_DM10_up    = trigSF;
+				  trigSF_tau_DM11_up    = trigSF;
+				  trigSF_tau_DM0_down   = trigSF;
+				  trigSF_tau_DM1_down   = trigSF;
+				  trigSF_tau_DM10_down  = trigSF;
+				  trigSF_tau_DM11_down  = trigSF;
 				}
 
 			  else if (trgRegions["tau"])
 				{
-				  trigSF           = singleTauSF[PERIOD].first;
-				  trigSFnoMET      = trigSF;
-				  trigSFnoTau      = 1.;
-				  trigSF_stau_up   = trigSF + singleTauSF[PERIOD].second;
-				  trigSF_stau_down = trigSF - singleTauSF[PERIOD].second;
-				  trigSF_met_up    = trigSF;
-				  trigSF_met_down  = trigSF;
-				  trigSF_tau_DM0_up	   = trigSF; 
-				  trigSF_tau_DM1_up	   = trigSF; 
-				  trigSF_tau_DM10_up   = trigSF; 
-				  trigSF_tau_DM11_up   = trigSF; 
-				  trigSF_tau_DM0_down  = trigSF; 
-				  trigSF_tau_DM1_down  = trigSF; 
-				  trigSF_tau_DM10_down = trigSF; 
-				  trigSF_tau_DM11_down = trigSF; 
-				  trigSF_ele_up	  = trigSF;
-				  trigSF_ele_down = trigSF;
-				  trigSF_mu_up	  = trigSF;
-				  trigSF_mu_down  = trigSF;
-				  trigSF_SL_mu_up = trigSF;
-				  trigSF_SL_mu_down = trigSF;
-				  trigSF_cross_mu_up = trigSF;
-				  trigSF_cross_mu_down = trigSF;
+				  trigSF                = singleTauSF[PERIOD].first;
+				  trigSFnoMET           = trigSF;
+				  trigSFnoTau           = 1.;
+				  trigSF_met_up         = trigSF;
+				  trigSF_met_down       = trigSF;
+				  trigSF_stau_up        = trigSF + singleTauSF[PERIOD].second;
+				  trigSF_stau_down      = trigSF - singleTauSF[PERIOD].second;
+				  trigSF_ele_up         = trigSF;
+				  trigSF_SL_ele_up      = trigSF;
+				  trigSF_cross_ele_up   = trigSF;
+				  trigSF_ele_down       = trigSF;
+				  trigSF_SL_ele_down    = trigSF;
+				  trigSF_cross_ele_down = trigSF;
+				  trigSF_mu_up          = trigSF;
+				  trigSF_SL_mu_up       = trigSF;
+				  trigSF_cross_mu_up    = trigSF;
+				  trigSF_mu_down        = trigSF;
+				  trigSF_SL_mu_down     = trigSF;
+				  trigSF_cross_mu_down  = trigSF;
+				  trigSF_tau_DM0_up     = trigSF;
+				  trigSF_tau_DM1_up     = trigSF;
+				  trigSF_tau_DM10_up    = trigSF;
+				  trigSF_tau_DM11_up    = trigSF;
+				  trigSF_tau_DM0_down   = trigSF;
+				  trigSF_tau_DM1_down   = trigSF;
+				  trigSF_tau_DM10_down  = trigSF;
+				  trigSF_tau_DM11_down  = trigSF;
 				}
 
 			  // eta region covered both by cross-trigger and single lepton trigger
@@ -3417,45 +3461,66 @@ int main (int argc, char** argv)
 				  if (tlv_secondLepton.Pt() < lep2_thresh) passCross = 0;
 
 				  //lepton trigger
-				  double SFL_Data = 1., SFL_MC = 1., SFL_Data_Err = 0., SFL_MC_Err = 0.;
+				  double Eff_SL_ele_Data = 1., Eff_SL_ele_MC = 1., Eff_SL_ele_Data_Err = 0., Eff_SL_ele_MC_Err = 0.;
 				  if (passSingle) {
-					SFL_Data = eTrgSF->get_EfficiencyData(tlv_firstLepton.Pt(), tlv_firstLepton.Eta(), pType);
-					SFL_MC   = eTrgSF->get_EfficiencyMC(  tlv_firstLepton.Pt(), tlv_firstLepton.Eta(), pType);
-					SFL_Data_Err = eTrgSF->get_EfficiencyDataError(tlv_firstLepton.Pt(), tlv_firstLepton.Eta(), pType);
-					SFL_MC_Err   = eTrgSF->get_EfficiencyMCError(  tlv_firstLepton.Pt(), tlv_firstLepton.Eta(), pType);
+					Eff_SL_ele_Data = eTrgSF->get_EfficiencyData(tlv_firstLepton.Pt(), tlv_firstLepton.Eta(), pType);
+					Eff_SL_ele_MC   = eTrgSF->get_EfficiencyMC(  tlv_firstLepton.Pt(), tlv_firstLepton.Eta(), pType);
+					Eff_SL_ele_Data_Err = eTrgSF->get_EfficiencyDataError(tlv_firstLepton.Pt(), tlv_firstLepton.Eta(), pType);
+					Eff_SL_ele_MC_Err   = eTrgSF->get_EfficiencyMCError(  tlv_firstLepton.Pt(), tlv_firstLepton.Eta(), pType);
 				  }
 
 				  //cross-trigger
 				  //e leg
-				  double SFl_Data = 1., SFl_MC = 1., SFl_Data_Err = 0., SFl_MC_Err = 0.;
+				  double Eff_cross_ele_Data = 1., Eff_cross_ele_MC = 1., Eff_cross_ele_Data_Err = 0., Eff_cross_ele_MC_Err = 0.;
 				  if (passCross) {
-					SFl_Data = eTauTrgSF->get_EfficiencyData(tlv_firstLepton.Pt(), tlv_firstLepton.Eta(), pType);
-					SFl_MC	 = eTauTrgSF->get_EfficiencyMC(tlv_firstLepton.Pt(),   tlv_firstLepton.Eta(), pType);
-					SFl_Data_Err = eTauTrgSF->get_EfficiencyDataError(tlv_firstLepton.Pt(), tlv_firstLepton.Eta(), pType);
-					SFl_MC_Err	 = eTauTrgSF->get_EfficiencyMCError(tlv_firstLepton.Pt(),	tlv_firstLepton.Eta(), pType);
+					Eff_cross_ele_Data = eTauTrgSF->get_EfficiencyData(tlv_firstLepton.Pt(), tlv_firstLepton.Eta(), pType);
+					Eff_cross_ele_MC	 = eTauTrgSF->get_EfficiencyMC(tlv_firstLepton.Pt(),   tlv_firstLepton.Eta(), pType);
+					Eff_cross_ele_Data_Err = eTauTrgSF->get_EfficiencyDataError(tlv_firstLepton.Pt(), tlv_firstLepton.Eta(), pType);
+					Eff_cross_ele_MC_Err	 = eTauTrgSF->get_EfficiencyMCError(tlv_firstLepton.Pt(),	tlv_firstLepton.Eta(), pType);
 				  }
 
 				  //tau leg
-				  double SFtau_Data = tauTrgSF_etau->getEfficiencyData(tlv_secondLepton.Pt(), DM2, 0); // last entry is uncertainty: 0 central, +1 up, -1 down
-				  double SFtau_MC   = tauTrgSF_etau->getEfficiencyMC  (tlv_secondLepton.Pt(), DM2, 0); // last entry is uncertainty: 0 central, +1 up, -1 down
+				  double Eff_cross_tau_Data = tauTrgSF_etau->getEfficiencyData(tlv_secondLepton.Pt(), DM2, 0); // last entry is uncertainty: 0 central, +1 up, -1 down
+				  double Eff_cross_tau_MC   = tauTrgSF_etau->getEfficiencyMC  (tlv_secondLepton.Pt(), DM2, 0); // last entry is uncertainty: 0 central, +1 up, -1 down
 
 				  // Compute efficiencies
-				  double Eff_Data = passSingle * SFL_Data - passCross * passSingle * std::min(SFl_Data, SFL_Data) * SFtau_Data + passCross * SFl_Data * SFtau_Data;
-				  double Eff_MC   = passSingle * SFL_MC   - passCross * passSingle * std::min(SFl_MC  , SFL_MC)   * SFtau_MC   + passCross * SFl_MC   * SFtau_MC;
+				  double Eff_Data = passSingle * Eff_SL_ele_Data - passCross * passSingle * std::min(Eff_cross_ele_Data, Eff_SL_ele_Data) * Eff_cross_tau_Data + passCross * Eff_cross_ele_Data * Eff_cross_tau_Data;
+				  double Eff_MC   = passSingle * Eff_SL_ele_MC   - passCross * passSingle * std::min(Eff_cross_ele_MC  , Eff_SL_ele_MC)   * Eff_cross_tau_MC   + passCross * Eff_cross_ele_MC   * Eff_cross_tau_MC;
 
-				  double Err_Data_ele   = passSingle * SFL_Data_Err   - passCross * passSingle * ((SFl_Data < SFL_Data) ? SFl_Data_Err  : SFL_Data_Err)   * SFtau_Data + passCross * SFl_Data_Err   * SFtau_Data;
-				  double Err_MC_ele     = passSingle * SFL_MC_Err     - passCross * passSingle * ((SFl_MC   < SFL_MC)   ? SFl_MC_Err    : SFL_MC_Err)     * SFtau_MC   + passCross * SFl_MC_Err     * SFtau_MC;
+				  // Compute uncertainties (separate for SingleElectron and ele leg of cross trigger)
+				  double Err_Data_SL_ele = passSingle * Eff_SL_ele_Data_Err - passCross * passSingle * (Eff_cross_ele_Data > Eff_SL_ele_Data) * Eff_SL_ele_Data_Err * Eff_cross_tau_Data;
+				  double Err_MC_SL_ele   = passSingle * Eff_SL_ele_MC_Err   - passCross * passSingle * (Eff_cross_ele_MC   > Eff_SL_ele_MC)   * Eff_SL_ele_MC_Err   * Eff_cross_tau_MC;
+
+				  double trigSF_SL_ele_err = 0.;
+				  if(passSingle) {
+					trigSF_SL_ele_err = eTrgSF->get_ScaleFactorError(Eff_Data, Eff_MC, Err_Data_SL_ele, Err_MC_SL_ele);
+				  }
+
+				  double Err_Data_cross_ele = - passCross * passSingle * (Eff_cross_ele_Data <= Eff_SL_ele_Data) * Eff_cross_ele_Data_Err * Eff_cross_tau_Data + passCross * Eff_cross_ele_Data_Err * Eff_cross_tau_Data;
+				  double Err_MC_cross_ele   = - passCross * passSingle * (Eff_cross_ele_MC   <= Eff_SL_ele_MC)   * Eff_cross_ele_MC_Err   * Eff_cross_tau_MC   + passCross * Eff_cross_ele_MC_Err   * Eff_cross_tau_MC;
+
+				  double trigSF_cross_ele_err = 0.;
+
+				  // if single lepton trigger and cross trigger are passed and the cross trigger is less efficient than
+				  // the single lepton trigger, the "combined" efficiency reduces to the single lepton trigger efficiency
+				  // and the uncertainty on the cross trigger leg is 0, if this is the case in both Data and MC also the
+				  // uncertaintiy on the trigger scale factor is 0
+				  if(passCross and !(passSingle and (Eff_cross_ele_Data <= Eff_SL_ele_Data or Eff_cross_ele_MC <= Eff_SL_ele_MC))) {
+					trigSF_cross_ele_err = eTrgSF->get_ScaleFactorError(Eff_Data, Eff_MC, Err_Data_cross_ele, Err_MC_cross_ele);
+				  }
+
+				  double Err_Data_ele = Err_Data_SL_ele + Err_Data_cross_ele;
+				  double Err_MC_ele   = Err_MC_SL_ele   + Err_MC_cross_ele;
 				  double trigSF_ele_err   = eTrgSF->get_ScaleFactorError(Eff_Data, Eff_MC, Err_Data_ele, Err_MC_ele);
-
 				  // for each DM, get the trigSF error if the tauh has the corresponding DM (and the cross trigger thresholds are passed), otherwise 0
-				  vector <double> trigSF_err    (N_tauhDM, 0);
-				  if(passCross && ((SFl_Data > SFL_Data) || (SFl_MC > SFL_MC))){
+				  vector <double> trigSF_err    (N_tauhDM, 0.);
+				  if(passCross and ((Eff_cross_ele_Data > Eff_SL_ele_Data) or (Eff_cross_ele_MC > Eff_SL_ele_MC))){
 					for (int idm  = 0; idm < N_tauhDM; idm ++){
 						if (isthisDM_second[idm]){
-							double SFtau_Data_Up = tauTrgSF_mutau->getEfficiencyData(tlv_secondLepton.Pt(), DM2, 1);
-							double SFtau_MC_Up   = tauTrgSF_mutau->getEfficiencyMC  (tlv_secondLepton.Pt(), DM2, 1);
-							double Eff_Data_Up = passSingle * SFL_Data - passCross * passSingle * std::min(SFl_Data, SFL_Data) * SFtau_Data_Up   + passCross * SFl_Data * SFtau_Data_Up;
-							double Eff_MC_Up   = passSingle * SFL_MC   - passCross * passSingle * std::min(SFl_MC  , SFL_MC)   * SFtau_MC_Up     + passCross * SFl_MC   * SFtau_MC_Up;
+							double Eff_cross_tau_Data_Up = tauTrgSF_mutau->getEfficiencyData(tlv_secondLepton.Pt(), DM2, 1);
+							double Eff_cross_tau_MC_Up   = tauTrgSF_mutau->getEfficiencyMC  (tlv_secondLepton.Pt(), DM2, 1);
+							double Eff_Data_Up = passSingle * Eff_SL_ele_Data - passCross * passSingle * std::min(Eff_cross_ele_Data, Eff_SL_ele_Data) * Eff_cross_tau_Data_Up   + passCross * Eff_cross_ele_Data * Eff_cross_tau_Data_Up;
+							double Eff_MC_Up   = passSingle * Eff_SL_ele_MC   - passCross * passSingle * std::min(Eff_cross_ele_MC  , Eff_SL_ele_MC)   * Eff_cross_tau_MC_Up     + passCross * Eff_cross_ele_MC   * Eff_cross_tau_MC_Up;
 							trigSF_err[idm] = eTrgSF->get_ScaleFactorError(Eff_Data, Eff_MC, Eff_Data_Up - Eff_Data, Eff_MC_Up - Eff_MC);
 						}
 					}
@@ -3463,37 +3528,41 @@ int main (int argc, char** argv)
 				  if(DEBUG)
 					{
 					  cout << "--- DEBUG Trigger weights --- " << endl;
-					  cout << "SFL_Data: "   << SFL_Data   << endl;
-					  cout << "SFL_MC: "     << SFL_MC     << endl;
-					  cout << "SFl_Data: "   << SFl_Data   << endl;
-					  cout << "SFl_MC: "     << SFl_MC     << endl;
-					  cout << "SFtau_Data: " << SFtau_Data << endl;
-					  cout << "SFtau_MC: "   << SFtau_MC   << endl;
+					  cout << "Eff_SL_ele_Data: "   << Eff_SL_ele_Data   << endl;
+					  cout << "Eff_SL_ele_MC: "     << Eff_SL_ele_MC     << endl;
+					  cout << "Eff_cross_ele_Data: "   << Eff_cross_ele_Data   << endl;
+					  cout << "Eff_cross_ele_MC: "     << Eff_cross_ele_MC     << endl;
+					  cout << "Eff_cross_tau_Data: " << Eff_cross_tau_Data << endl;
+					  cout << "Eff_cross_tau_MC: "   << Eff_cross_tau_MC   << endl;
 					}
 
 				  trigSF                = eTrgSF->get_ScaleFactor(Eff_Data, Eff_MC);
 				  trigSFnoMET           = trigSF;
 				  trigSFnoTau           = trigSF;
-				  trigSF_ele_up         = trigSF + trigSF_ele_err;
-				  trigSF_ele_down       = trigSF - trigSF_ele_err;
-				  trigSF_mu_up          = trigSF;
-				  trigSF_mu_down        = trigSF;
-				  trigSF_SL_mu_up       = trigSF;
-				  trigSF_SL_mu_down     = trigSF;
-				  trigSF_cross_mu_up    = trigSF;
-				  trigSF_cross_mu_down  = trigSF;
-				  trigSF_tau_DM0_up     = trigSF + trigSF_err[0];
-				  trigSF_tau_DM0_down   = trigSF - trigSF_err[0];
-				  trigSF_tau_DM1_up     = trigSF + trigSF_err[1];
-				  trigSF_tau_DM1_down   = trigSF - trigSF_err[1];
-				  trigSF_tau_DM10_up    = trigSF + trigSF_err[2];
-				  trigSF_tau_DM10_down  = trigSF - trigSF_err[2];
-				  trigSF_tau_DM11_up    = trigSF + trigSF_err[3];
-				  trigSF_tau_DM11_down  = trigSF - trigSF_err[3];
 				  trigSF_met_up         = trigSF;
 				  trigSF_met_down       = trigSF;
 				  trigSF_stau_up        = trigSF;
 				  trigSF_stau_down      = trigSF;
+				  trigSF_ele_up         = trigSF + trigSF_ele_err;
+				  trigSF_SL_ele_up      = trigSF + trigSF_SL_ele_err;
+				  trigSF_cross_ele_up   = trigSF + trigSF_cross_ele_err;
+				  trigSF_ele_down       = trigSF - trigSF_ele_err;
+				  trigSF_SL_ele_down    = trigSF - trigSF_SL_ele_err;
+				  trigSF_cross_ele_down = trigSF - trigSF_cross_ele_err;
+				  trigSF_mu_up          = trigSF;
+				  trigSF_SL_mu_up       = trigSF;
+				  trigSF_cross_mu_up    = trigSF;
+				  trigSF_mu_down        = trigSF;
+				  trigSF_SL_mu_down     = trigSF;
+				  trigSF_cross_mu_down  = trigSF;
+				  trigSF_tau_DM0_up     = trigSF + trigSF_err[0];
+				  trigSF_tau_DM1_up     = trigSF + trigSF_err[1];
+				  trigSF_tau_DM10_up    = trigSF + trigSF_err[2];
+				  trigSF_tau_DM11_up    = trigSF + trigSF_err[3];
+				  trigSF_tau_DM0_down   = trigSF - trigSF_err[0];
+				  trigSF_tau_DM1_down   = trigSF - trigSF_err[1];
+				  trigSF_tau_DM10_down  = trigSF - trigSF_err[2];
+				  trigSF_tau_DM11_down  = trigSF - trigSF_err[3];
 				}
 
 			  else //eta region covered only by single lepton trigger (including all 2016)
@@ -3521,29 +3590,33 @@ int main (int argc, char** argv)
 					}
 				  }
 
-				  trigSF          = SF;
-				  trigSFnoMET     = trigSF;
-				  trigSFnoTau     = trigSF;
-				  trigSF_ele_up   = SF + 1. * SF_Err;
-				  trigSF_ele_down = SF - 1. * SF_Err;
-				  trigSF_mu_up	  = trigSF;
-				  trigSF_mu_down  = trigSF;
-				  trigSF_SL_mu_up = trigSF;
-				  trigSF_SL_mu_down = trigSF;
-				  trigSF_cross_mu_up = trigSF;
-				  trigSF_cross_mu_down = trigSF;
-				  trigSF_met_up   = trigSF;
-				  trigSF_met_down = trigSF;
-				  trigSF_stau_up   = trigSF;
-				  trigSF_stau_down = trigSF;
-				  trigSF_tau_DM0_up	   = trigSF; 
-				  trigSF_tau_DM1_up	   = trigSF; 
-				  trigSF_tau_DM10_up   = trigSF; 
-				  trigSF_tau_DM11_up   = trigSF; 
-				  trigSF_tau_DM0_down  = trigSF; 
-				  trigSF_tau_DM1_down  = trigSF; 
-				  trigSF_tau_DM10_down = trigSF; 
-				  trigSF_tau_DM11_down = trigSF; 
+				  trigSF                = SF;
+				  trigSFnoMET           = trigSF;
+				  trigSFnoTau           = trigSF;
+				  trigSF_met_up         = trigSF;
+				  trigSF_met_down       = trigSF;
+				  trigSF_stau_up        = trigSF;
+				  trigSF_stau_down      = trigSF;
+				  trigSF_ele_up         = SF + 1. * SF_Err;
+				  trigSF_SL_ele_up      = trigSF_ele_up;
+				  trigSF_cross_ele_up   = trigSF;
+				  trigSF_ele_down       = SF - 1. * SF_Err;
+				  trigSF_SL_ele_down    = trigSF_ele_down;
+				  trigSF_cross_ele_down = trigSF;
+				  trigSF_mu_up          = trigSF;
+				  trigSF_SL_mu_up       = trigSF;
+				  trigSF_cross_mu_up    = trigSF;
+				  trigSF_mu_down        = trigSF;
+				  trigSF_SL_mu_down     = trigSF;
+				  trigSF_cross_mu_down  = trigSF;
+				  trigSF_tau_DM0_up     = trigSF;
+				  trigSF_tau_DM1_up     = trigSF;
+				  trigSF_tau_DM10_up    = trigSF;
+				  trigSF_tau_DM11_up    = trigSF;
+				  trigSF_tau_DM0_down   = trigSF;
+				  trigSF_tau_DM1_down   = trigSF;
+				  trigSF_tau_DM10_down  = trigSF;
+				  trigSF_tau_DM11_down  = trigSF;
 				}
 			}
 
@@ -3552,56 +3625,64 @@ int main (int argc, char** argv)
 			{
 			  if (trgRegions["met"])
 				{
-				  trigSF          = metSF.getSF(vMETnoMu.Mod());
-				  trigSFnoMET     = 1.;
-				  trigSFnoTau     = trigSF;
-				  trigSF_met_up   = trigSF + metSF.getSFError(vMETnoMu.Mod());
-				  trigSF_met_down = trigSF - metSF.getSFError(vMETnoMu.Mod());
-				  trigSF_stau_up   = trigSF;
-				  trigSF_stau_down = trigSF;
-				  trigSF_tau_DM0_up	   = trigSF; 
-				  trigSF_tau_DM1_up	   = trigSF; 
-				  trigSF_tau_DM10_up   = trigSF; 
-				  trigSF_tau_DM11_up   = trigSF; 
-				  trigSF_tau_DM0_down  = trigSF; 
-				  trigSF_tau_DM1_down  = trigSF; 
-				  trigSF_tau_DM10_down = trigSF; 
-				  trigSF_tau_DM11_down = trigSF; 
-				  trigSF_ele_up	  = trigSF;
-				  trigSF_ele_down = trigSF;
-				  trigSF_mu_up	  = trigSF;
-				  trigSF_mu_down  = trigSF;
-				  trigSF_SL_mu_up = trigSF;
-				  trigSF_SL_mu_down = trigSF;
-				  trigSF_cross_mu_up = trigSF;
-				  trigSF_cross_mu_down = trigSF;
+				  trigSF                = metSF.getSF(vMETnoMu.Mod());
+				  trigSFnoMET           = 1.;
+				  trigSFnoTau           = trigSF;
+				  trigSF_met_up         = trigSF + metSF.getSFError(vMETnoMu.Mod());
+				  trigSF_met_down       = trigSF - metSF.getSFError(vMETnoMu.Mod());
+				  trigSF_stau_up        = trigSF;
+				  trigSF_stau_down      = trigSF;
+				  trigSF_ele_up         = trigSF;
+				  trigSF_SL_ele_up      = trigSF;
+				  trigSF_cross_ele_up   = trigSF;
+				  trigSF_ele_down       = trigSF;
+				  trigSF_SL_ele_down    = trigSF;
+				  trigSF_cross_ele_down = trigSF;
+				  trigSF_mu_up          = trigSF;
+				  trigSF_SL_mu_up       = trigSF;
+				  trigSF_cross_mu_up    = trigSF;
+				  trigSF_mu_down        = trigSF;
+				  trigSF_SL_mu_down     = trigSF;
+				  trigSF_cross_mu_down  = trigSF;
+				  trigSF_tau_DM0_up     = trigSF;
+				  trigSF_tau_DM1_up     = trigSF;
+				  trigSF_tau_DM10_up    = trigSF;
+				  trigSF_tau_DM11_up    = trigSF;
+				  trigSF_tau_DM0_down   = trigSF;
+				  trigSF_tau_DM1_down   = trigSF;
+				  trigSF_tau_DM10_down  = trigSF;
+				  trigSF_tau_DM11_down  = trigSF;
 				}
 
 			  else if (trgRegions["tau"])
 				{
-				  trigSF           = singleTauSF[PERIOD].first;
-				  trigSFnoMET      = trigSF;
-				  trigSFnoTau      = 1.;
-				  trigSF_stau_up   = trigSF + singleTauSF[PERIOD].second;
-				  trigSF_stau_down = trigSF - singleTauSF[PERIOD].second;
-				  trigSF_met_up    = trigSF;
-				  trigSF_met_down  = trigSF;
-				  trigSF_tau_DM0_up	   = trigSF; 
-				  trigSF_tau_DM1_up	   = trigSF; 
-				  trigSF_tau_DM10_up   = trigSF; 
-				  trigSF_tau_DM11_up   = trigSF; 
-				  trigSF_tau_DM0_down  = trigSF; 
-				  trigSF_tau_DM1_down  = trigSF; 
-				  trigSF_tau_DM10_down = trigSF; 
-				  trigSF_tau_DM11_down = trigSF; 
-				  trigSF_ele_up	  = trigSF;
-				  trigSF_ele_down = trigSF;
-				  trigSF_mu_up	  = trigSF;
-				  trigSF_mu_down  = trigSF;
-				  trigSF_SL_mu_up = trigSF;
-				  trigSF_SL_mu_down = trigSF;
-				  trigSF_cross_mu_up = trigSF;
-				  trigSF_cross_mu_down = trigSF;
+				  trigSF                = singleTauSF[PERIOD].first;
+				  trigSFnoMET           = trigSF;
+				  trigSFnoTau           = 1.;
+				  trigSF_met_up         = trigSF;
+				  trigSF_met_down       = trigSF;
+				  trigSF_stau_up        = trigSF + singleTauSF[PERIOD].second;
+				  trigSF_stau_down      = trigSF - singleTauSF[PERIOD].second;
+				  trigSF_ele_up         = trigSF;
+				  trigSF_SL_ele_up      = trigSF;
+				  trigSF_cross_ele_up   = trigSF;
+				  trigSF_ele_down       = trigSF;
+				  trigSF_SL_ele_down    = trigSF;
+				  trigSF_cross_ele_down = trigSF;
+				  trigSF_mu_up          = trigSF;
+				  trigSF_SL_mu_up       = trigSF;
+				  trigSF_cross_mu_up    = trigSF;
+				  trigSF_mu_down        = trigSF;
+				  trigSF_SL_mu_down     = trigSF;
+				  trigSF_cross_mu_down  = trigSF;
+				  trigSF_tau_DM0_up     = trigSF;
+				  trigSF_tau_DM1_up     = trigSF;
+				  trigSF_tau_DM10_up    = trigSF;
+				  trigSF_tau_DM11_up    = trigSF;
+				  trigSF_tau_DM0_down   = trigSF;
+				  trigSF_tau_DM1_down   = trigSF;
+				  trigSF_tau_DM10_down  = trigSF;
+				  trigSF_tau_DM11_down  = trigSF;
 				}
 
 			  // DiTau region
@@ -3611,7 +3692,7 @@ int main (int argc, char** argv)
 				// last entry is uncertainty: 0 central, +1 up, -1 down
 				double SF1 = tauTrgSF_ditau->getSF(tlv_firstLepton.Pt() , DM1, 0);
 				double SF2 = tauTrgSF_ditau->getSF(tlv_secondLepton.Pt(), DM2, 0);
-			  
+
 				// for each DM, fill a trigSF branch with the up/down values if taus have
 				// the corresponding DM, otherwise fill with nominal trigSF value
 				vector <double> SF1_up(N_tauhDM, SF1), SF1_down (N_tauhDM, SF1);
@@ -3630,38 +3711,33 @@ int main (int argc, char** argv)
 						SF2_down[idm] = tauTrgSF_ditau->getSF(tlv_secondLepton.Pt(), DM2, -1);
 					  }
 				  }
-				
-				trigSF					= SF1         * SF2;
-				trigSFnoMET				= trigSF;
-				trigSFnoTau				= trigSF;
-				trigSF_tau_DM0_up		= SF1_up[0]   * SF2_up[0];
-				trigSF_tau_DM1_up		= SF1_up[1]   * SF2_up[1];
-				trigSF_tau_DM10_up		= SF1_up[2]   * SF2_up[2];
-				trigSF_tau_DM11_up		= SF1_up[3]   * SF2_up[3];
-				trigSF_tau_DM0_down		= SF1_down[0] * SF2_down[0];
-				trigSF_tau_DM1_down		= SF1_down[1] * SF2_down[1];
-				trigSF_tau_DM10_down	= SF1_down[2] * SF2_down[2];
-				trigSF_tau_DM11_down	= SF1_down[3] * SF2_down[3];
-				trigSF_met_up    = trigSF;
-				trigSF_met_down  = trigSF;
-				trigSF_stau_up   = trigSF;
-				trigSF_stau_down = trigSF;
-				trigSF_tau_DM0_up	 = trigSF; 
-				trigSF_tau_DM1_up	 = trigSF; 
-				trigSF_tau_DM10_up   = trigSF; 
-				trigSF_tau_DM11_up   = trigSF; 
-				trigSF_tau_DM0_down  = trigSF; 
-				trigSF_tau_DM1_down  = trigSF; 
-				trigSF_tau_DM10_down = trigSF; 
-				trigSF_tau_DM11_down = trigSF; 
-				trigSF_ele_up   = trigSF;
-				trigSF_ele_down = trigSF;
-				trigSF_mu_up    = trigSF;
-				trigSF_mu_down  = trigSF;
-				trigSF_SL_mu_up = trigSF;
-				trigSF_SL_mu_down = trigSF;
-				trigSF_cross_mu_up = trigSF;
-				trigSF_cross_mu_down = trigSF;
+				trigSF                = SF1 * SF2;
+				trigSFnoMET           = trigSF;
+				trigSFnoTau           = trigSF;
+				trigSF_met_up         = trigSF;
+				trigSF_met_down       = trigSF;
+				trigSF_stau_up        = trigSF;
+				trigSF_stau_down      = trigSF;
+				trigSF_ele_up         = trigSF;
+				trigSF_SL_ele_up      = trigSF;
+				trigSF_cross_ele_up   = trigSF;
+				trigSF_ele_down       = trigSF;
+				trigSF_SL_ele_down    = trigSF;
+				trigSF_cross_ele_down = trigSF;
+				trigSF_mu_up          = trigSF;
+				trigSF_SL_mu_up       = trigSF;
+				trigSF_cross_mu_up    = trigSF;
+				trigSF_mu_down        = trigSF;
+				trigSF_SL_mu_down     = trigSF;
+				trigSF_cross_mu_down  = trigSF;
+				trigSF_tau_DM0_up     = SF1_up[0] * SF2_up[0];
+				trigSF_tau_DM1_up     = SF1_up[1] * SF2_up[1];
+				trigSF_tau_DM10_up    = SF1_up[2] * SF2_up[2];
+				trigSF_tau_DM11_up    = SF1_up[3] * SF2_up[3];
+				trigSF_tau_DM0_down   = SF1_down[0] * SF2_down[0];
+				trigSF_tau_DM1_down   = SF1_down[1] * SF2_down[1];
+				trigSF_tau_DM10_down  = SF1_down[2] * SF2_down[2];
+				trigSF_tau_DM11_down  = SF1_down[3] * SF2_down[3];
 			  }
 			}
 		  
@@ -3670,53 +3746,66 @@ int main (int argc, char** argv)
 			{
 			  if (trgRegions["met"])
 				{
-				  trigSF          = metSF.getSF(vMETnoMu.Mod());
-				  trigSFnoMET     = 1.;
-				  trigSFnoTau     = trigSF;
-				  trigSF_met_up   = trigSF + metSF.getSFError(vMETnoMu.Mod());
-				  trigSF_met_down = trigSF - metSF.getSFError(vMETnoMu.Mod());
-				  trigSF_tau_DM0_up	   = trigSF; 
-				  trigSF_tau_DM1_up	   = trigSF; 
-				  trigSF_tau_DM10_up   = trigSF; 
-				  trigSF_tau_DM11_up   = trigSF; 
-				  trigSF_tau_DM0_down  = trigSF; 
-				  trigSF_tau_DM1_down  = trigSF; 
-				  trigSF_tau_DM10_down = trigSF; 
-				  trigSF_tau_DM11_down = trigSF; 
-				  trigSF_ele_up	  = trigSF;
-				  trigSF_ele_down = trigSF;
-				  trigSF_mu_up	  = trigSF;
-				  trigSF_mu_down  = trigSF;
-				  trigSF_SL_mu_up = trigSF;
-				  trigSF_SL_mu_down = trigSF;
-				  trigSF_cross_mu_up = trigSF;
-				  trigSF_cross_mu_down = trigSF;
+				  trigSF                = metSF.getSF(vMETnoMu.Mod());
+				  trigSFnoMET           = 1.;
+				  trigSFnoTau           = trigSF;
+				  trigSF_met_up         = trigSF + metSF.getSFError(vMETnoMu.Mod());
+				  trigSF_met_down       = trigSF - metSF.getSFError(vMETnoMu.Mod());
+				  trigSF_stau_up        = trigSF;
+				  trigSF_stau_down      = trigSF;
+				  trigSF_ele_up         = trigSF;
+				  trigSF_SL_ele_up      = trigSF;
+				  trigSF_cross_ele_up   = trigSF;
+				  trigSF_ele_down       = trigSF;
+				  trigSF_SL_ele_down    = trigSF;
+				  trigSF_cross_ele_down = trigSF;
+				  trigSF_mu_up          = trigSF;
+				  trigSF_SL_mu_up       = trigSF;
+				  trigSF_cross_mu_up    = trigSF;
+				  trigSF_mu_down        = trigSF;
+				  trigSF_SL_mu_down     = trigSF;
+				  trigSF_cross_mu_down  = trigSF;
+				  trigSF_tau_DM0_up     = trigSF;
+				  trigSF_tau_DM1_up     = trigSF;
+				  trigSF_tau_DM10_up    = trigSF;
+				  trigSF_tau_DM11_up    = trigSF;
+				  trigSF_tau_DM0_down   = trigSF;
+				  trigSF_tau_DM1_down   = trigSF;
+				  trigSF_tau_DM10_down  = trigSF;
+				  trigSF_tau_DM11_down  = trigSF;
 				}
 			  else if (trgRegions["legacy"])
 				{
+				  // use absolute value of eta for muons, because the SFs are given from 0 to 2.4
 				  double SF     = muTrgSF->get_ScaleFactor(     tlv_firstLepton.Pt(), fabs(tlv_firstLepton.Eta()), pType);
 				  double SF_Err = muTrgSF->get_ScaleFactorError(tlv_firstLepton.Pt(), fabs(tlv_firstLepton.Eta()), pType);
 				  trigSF = SF;
-				  trigSFnoMET    = trigSF;
-				  trigSFnoTau	 = trigSF;
-				  trigSF_mu_up   = SF + 1. * SF_Err;
-				  trigSF_mu_down = SF - 1. * SF_Err;
-				  trigSF_SL_mu_up = trigSF_mu_up;
-				  trigSF_SL_mu_down = trigSF_mu_down;
-				  trigSF_cross_mu_up = trigSF;
-				  trigSF_cross_mu_down = trigSF;
-				  trigSF_ele_up	  = trigSF;
-				  trigSF_ele_down = trigSF;
-				  trigSF_met_up   = trigSF;
-				  trigSF_met_down = trigSF;
-				  trigSF_tau_DM0_up	   = trigSF; 
-				  trigSF_tau_DM1_up	   = trigSF; 
-				  trigSF_tau_DM10_up   = trigSF; 
-				  trigSF_tau_DM11_up   = trigSF; 
-				  trigSF_tau_DM0_down  = trigSF; 
-				  trigSF_tau_DM1_down  = trigSF; 
-				  trigSF_tau_DM10_down = trigSF; 
-				  trigSF_tau_DM11_down = trigSF; 
+				  trigSFnoMET           = trigSF;
+				  trigSFnoTau           = trigSF;
+				  trigSF_met_up         = trigSF;
+				  trigSF_met_down       = trigSF;
+				  trigSF_stau_up        = trigSF;
+				  trigSF_stau_down      = trigSF;
+				  trigSF_ele_up         = trigSF;
+				  trigSF_SL_ele_up      = trigSF;
+				  trigSF_cross_ele_up   = trigSF;
+				  trigSF_ele_down       = trigSF;
+				  trigSF_SL_ele_down    = trigSF;
+				  trigSF_cross_ele_down = trigSF;
+				  trigSF_mu_up          = SF + 1. * SF_Err;
+				  trigSF_SL_mu_up       = trigSF_mu_up;
+				  trigSF_cross_mu_up    = trigSF;
+				  trigSF_mu_down        = SF - 1. * SF_Err;
+				  trigSF_SL_mu_down     = trigSF_mu_down;
+				  trigSF_cross_mu_down  = trigSF;
+				  trigSF_tau_DM0_up     = trigSF;
+				  trigSF_tau_DM1_up     = trigSF;
+				  trigSF_tau_DM10_up    = trigSF;
+				  trigSF_tau_DM11_up    = trigSF;
+				  trigSF_tau_DM0_down   = trigSF;
+				  trigSF_tau_DM1_down   = trigSF;
+				  trigSF_tau_DM10_down  = trigSF;
+				  trigSF_tau_DM11_down  = trigSF;
 				}
 			}
 
@@ -3725,83 +3814,95 @@ int main (int argc, char** argv)
 			{
 			  if (trgRegions["met"])
 				{
-				  trigSF          = metSF.getSF(vMETnoMu.Mod());
-				  trigSFnoMET     = 1.;
-				  trigSFnoTau     = trigSF;
-				  trigSF_met_up   = trigSF + metSF.getSFError(vMETnoMu.Mod());
-				  trigSF_met_down = trigSF - metSF.getSFError(vMETnoMu.Mod());
-				  trigSF_stau_up   = trigSF;
-				  trigSF_stau_down = trigSF;
-				  trigSF_tau_DM0_up	   = trigSF; 
-				  trigSF_tau_DM1_up	   = trigSF; 
-				  trigSF_tau_DM10_up   = trigSF; 
-				  trigSF_tau_DM11_up   = trigSF; 
-				  trigSF_tau_DM0_down  = trigSF; 
-				  trigSF_tau_DM1_down  = trigSF; 
-				  trigSF_tau_DM10_down = trigSF; 
-				  trigSF_tau_DM11_down = trigSF; 
-				  trigSF_ele_up	  = trigSF;
-				  trigSF_ele_down = trigSF;
-				  trigSF_mu_up	  = trigSF;
-				  trigSF_mu_down  = trigSF;
-				  trigSF_SL_mu_up = trigSF;
-				  trigSF_SL_mu_down = trigSF;
-				  trigSF_cross_mu_up = trigSF;
-				  trigSF_cross_mu_down = trigSF;
+				  trigSF                = metSF.getSF(vMETnoMu.Mod());
+				  trigSFnoMET           = 1.;
+				  trigSFnoTau           = trigSF;
+				  trigSF_met_up         = trigSF + metSF.getSFError(vMETnoMu.Mod());
+				  trigSF_met_down       = trigSF - metSF.getSFError(vMETnoMu.Mod());
+				  trigSF_stau_up        = trigSF;
+				  trigSF_stau_down      = trigSF;
+				  trigSF_ele_up         = trigSF;
+				  trigSF_SL_ele_up      = trigSF;
+				  trigSF_cross_ele_up   = trigSF;
+				  trigSF_ele_down       = trigSF;
+				  trigSF_SL_ele_down    = trigSF;
+				  trigSF_cross_ele_down = trigSF;
+				  trigSF_mu_up          = trigSF;
+				  trigSF_SL_mu_up       = trigSF;
+				  trigSF_cross_mu_up    = trigSF;
+				  trigSF_mu_down        = trigSF;
+				  trigSF_SL_mu_down     = trigSF;
+				  trigSF_cross_mu_down  = trigSF;
+				  trigSF_tau_DM0_up     = trigSF;
+				  trigSF_tau_DM1_up     = trigSF;
+				  trigSF_tau_DM10_up    = trigSF;
+				  trigSF_tau_DM11_up    = trigSF;
+				  trigSF_tau_DM0_down   = trigSF;
+				  trigSF_tau_DM1_down   = trigSF;
+				  trigSF_tau_DM10_down  = trigSF;
+				  trigSF_tau_DM11_down  = trigSF;
 				}
 			  else if (trgRegions["legacy"]) {
 				double SF     = eTrgSF->get_ScaleFactor(     tlv_firstLepton.Pt(), tlv_firstLepton.Eta(), pType);
 				double SF_Err = eTrgSF->get_ScaleFactorError(tlv_firstLepton.Pt(), tlv_firstLepton.Eta(), pType);
 				trigSF = SF;
-				trigSFnoMET          = trigSF;
-				trigSFnoTau          = trigSF;
-				trigSF_ele_up        = SF + 1. * SF_Err;
-				trigSF_ele_down      = SF - 1. * SF_Err;
-				trigSF_mu_up	     = trigSF;
-				trigSF_mu_down       = trigSF;
-				trigSF_SL_mu_up      = trigSF;
-				trigSF_SL_mu_down    = trigSF;
-				trigSF_cross_mu_up   = trigSF;
-				trigSF_cross_mu_down = trigSF;
-				trigSF_met_up        = trigSF;
-				trigSF_met_down      = trigSF;
-				trigSF_stau_up       = trigSF;
-				trigSF_stau_down     = trigSF;
-				trigSF_tau_DM0_up	 = trigSF; 
-				trigSF_tau_DM1_up	 = trigSF; 
-				trigSF_tau_DM10_up   = trigSF; 
-				trigSF_tau_DM11_up   = trigSF; 
-				trigSF_tau_DM0_down  = trigSF; 
-				trigSF_tau_DM1_down  = trigSF; 
-				trigSF_tau_DM10_down = trigSF; 
-				trigSF_tau_DM11_down = trigSF; 
+				trigSFnoMET           = trigSF;
+				trigSFnoTau           = trigSF;
+				trigSF_met_up         = trigSF;
+				trigSF_met_down       = trigSF;
+				trigSF_stau_up        = trigSF;
+				trigSF_stau_down      = trigSF;
+				trigSF_ele_up         = SF + 1. * SF_Err;
+				trigSF_SL_ele_up      = trigSF_ele_up;
+				trigSF_cross_ele_up   = trigSF;
+				trigSF_ele_down       = SF - 1. * SF_Err;
+				trigSF_SL_ele_down    = trigSF_ele_down;
+				trigSF_cross_ele_down = trigSF;
+				trigSF_mu_up          = trigSF;
+				trigSF_SL_mu_up       = trigSF;
+				trigSF_cross_mu_up    = trigSF;
+				trigSF_mu_down        = trigSF;
+				trigSF_SL_mu_down     = trigSF;
+				trigSF_cross_mu_down  = trigSF;
+				trigSF_tau_DM0_up     = trigSF;
+				trigSF_tau_DM1_up     = trigSF;
+				trigSF_tau_DM10_up    = trigSF;
+				trigSF_tau_DM11_up    = trigSF;
+				trigSF_tau_DM0_down   = trigSF;
+				trigSF_tau_DM1_down   = trigSF;
+				trigSF_tau_DM10_down  = trigSF;
+				trigSF_tau_DM11_down  = trigSF;
 			  }
 			}
 		} // end if(applytriggers)
 
-	  theSmallTree.m_trigSF					= isMC ? trigSF           : 1.0;
-	  theSmallTree.m_trigSFnoMET			= isMC ? trigSFnoMET      : 1.0;
-	  theSmallTree.m_trigSFnoTau			= isMC ? trigSFnoTau      : 1.0;
-	  theSmallTree.m_trigSF_ele_up			= isMC ? trigSF_ele_up    : 1.0;
-	  theSmallTree.m_trigSF_mu_up			= isMC ? trigSF_mu_up     : 1.0;
-	  theSmallTree.m_trigSF_SL_mu_up		= isMC ? trigSF_SL_mu_up      : 1.0;
-	  theSmallTree.m_trigSF_cross_mu_up		= isMC ? trigSF_cross_mu_up   : 1.0;
-	  theSmallTree.m_trigSF_tau_DM0_up		= isMC ? trigSF_tau_DM0_up    : 1.0;
-	  theSmallTree.m_trigSF_tau_DM1_up		= isMC ? trigSF_tau_DM1_up    : 1.0;
-	  theSmallTree.m_trigSF_tau_DM10_up		= isMC ? trigSF_tau_DM10_up   : 1.0;
-	  theSmallTree.m_trigSF_tau_DM11_up		= isMC ? trigSF_tau_DM11_up   : 1.0;
-	  theSmallTree.m_trigSF_ele_down		= isMC ? trigSF_ele_down  : 1.0;
-	  theSmallTree.m_trigSF_mu_down			= isMC ? trigSF_mu_down   : 1.0;
-	  theSmallTree.m_trigSF_SL_mu_down		= isMC ? trigSF_SL_mu_down    : 1.0;
-	  theSmallTree.m_trigSF_cross_mu_down	= isMC ? trigSF_cross_mu_down : 1.0;
-	  theSmallTree.m_trigSF_tau_DM0_down	= isMC ? trigSF_tau_DM0_down  : 1.0;
-	  theSmallTree.m_trigSF_tau_DM1_down	= isMC ? trigSF_tau_DM1_down  : 1.0;
-	  theSmallTree.m_trigSF_tau_DM10_down	= isMC ? trigSF_tau_DM10_down : 1.0;
-	  theSmallTree.m_trigSF_tau_DM11_down	= isMC ? trigSF_tau_DM11_down : 1.0;
-	  theSmallTree.m_trigSF_met_up			= isMC ? trigSF_met_up    : 1.0;
-	  theSmallTree.m_trigSF_met_down		= isMC ? trigSF_met_down  : 1.0;
-	  theSmallTree.m_trigSF_stau_up			= isMC ? trigSF_stau_up   : 1.0;
-	  theSmallTree.m_trigSF_stau_down		= isMC ? trigSF_stau_down : 1.0;
+	  theSmallTree.m_trigSF                = isMC ? trigSF                : 1.0;
+	  theSmallTree.m_trigSFnoMET           = isMC ? trigSFnoMET           : 1.0;
+	  theSmallTree.m_trigSFnoTau           = isMC ? trigSFnoTau           : 1.0;
+	  theSmallTree.m_trigSF_ele_up         = isMC ? trigSF_ele_up         : 1.0;
+	  theSmallTree.m_trigSF_SL_ele_up      = isMC ? trigSF_SL_ele_up      : 1.0;
+	  theSmallTree.m_trigSF_cross_ele_up   = isMC ? trigSF_cross_ele_up   : 1.0;
+	  theSmallTree.m_trigSF_mu_up          = isMC ? trigSF_mu_up          : 1.0;
+	  theSmallTree.m_trigSF_SL_mu_up       = isMC ? trigSF_SL_mu_up       : 1.0;
+	  theSmallTree.m_trigSF_cross_mu_up    = isMC ? trigSF_cross_mu_up    : 1.0;
+	  theSmallTree.m_trigSF_tau_DM0_up     = isMC ? trigSF_tau_DM0_up     : 1.0;
+	  theSmallTree.m_trigSF_tau_DM1_up     = isMC ? trigSF_tau_DM1_up     : 1.0;
+	  theSmallTree.m_trigSF_tau_DM10_up    = isMC ? trigSF_tau_DM10_up    : 1.0;
+	  theSmallTree.m_trigSF_tau_DM11_up    = isMC ? trigSF_tau_DM11_up    : 1.0;
+	  theSmallTree.m_trigSF_ele_down       = isMC ? trigSF_ele_down       : 1.0;
+	  theSmallTree.m_trigSF_SL_ele_down    = isMC ? trigSF_SL_ele_down    : 1.0;
+	  theSmallTree.m_trigSF_cross_ele_down = isMC ? trigSF_cross_ele_down : 1.0;
+	  theSmallTree.m_trigSF_mu_down        = isMC ? trigSF_mu_down        : 1.0;
+	  theSmallTree.m_trigSF_SL_mu_down     = isMC ? trigSF_SL_mu_down     : 1.0;
+	  theSmallTree.m_trigSF_cross_mu_down  = isMC ? trigSF_cross_mu_down  : 1.0;
+	  theSmallTree.m_trigSF_tau_DM0_down   = isMC ? trigSF_tau_DM0_down   : 1.0;
+	  theSmallTree.m_trigSF_tau_DM1_down   = isMC ? trigSF_tau_DM1_down   : 1.0;
+	  theSmallTree.m_trigSF_tau_DM10_down  = isMC ? trigSF_tau_DM10_down  : 1.0;
+	  theSmallTree.m_trigSF_tau_DM11_down  = isMC ? trigSF_tau_DM11_down  : 1.0;
+	  theSmallTree.m_trigSF_met_up         = isMC ? trigSF_met_up         : 1.0;
+	  theSmallTree.m_trigSF_met_down       = isMC ? trigSF_met_down       : 1.0;
+	  theSmallTree.m_trigSF_stau_up        = isMC ? trigSF_stau_up        : 1.0;
+	  theSmallTree.m_trigSF_stau_down      = isMC ? trigSF_stau_down      : 1.0;
 
 	  theSmallTree.m_totalWeight = (isMC? (59970./7.20811e+10) * theSmallTree.m_MC_weight * theSmallTree.m_PUReweight *
 									trigSF * theSmallTree.m_IdFakeSF_deep_2d: 1.0);
