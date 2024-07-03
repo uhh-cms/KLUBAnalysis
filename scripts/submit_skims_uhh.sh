@@ -7,7 +7,7 @@ STITCHING_OFF="0"
 DRYRUN="0"
 RESUBMIT="0"
 OUT_TAG=""
-IN_TAG="uhh_2017_v5"
+IN_TAG="uhh_2017_v6"
 DATA_PERIOD="UL17"
 DATA_USER="${USER}"
 DATA_PERIOD_CHOICES=( "UL2016preVFP" "UL2016postVFP" "UL17" "UL18" )
@@ -434,22 +434,22 @@ DATA_MAP=(
     ["MET_Run2017F"]="-n 50 --rt 24 --datasetType 1"
 )
 
-# # Skimming submission
-# for ds in ${!DATA_MAP[@]}; do
-#     if [ ${#LISTS_DATA[@]} -eq 0 ]; then
-#         echo "WARNING: No files found in "${LIST_DATA_DIR}"."
-#     fi
-#     sample=$(find_sample ${ds} ${LIST_DATA_DIR} ${#LISTS_DATA[@]} ${LISTS_DATA[@]})
-#     if [[ ${sample} =~ ${SEARCH_SPACE} ]]; then
-#         ERRORS+=( ${sample} )
-#     else
-#         eval `scram unsetenv -sh` # unset CMSSW environment
-#         [[ ${NO_LISTS} -eq 0 ]] && produce_list --kind Data --sample ${sample} --outtxt ${REGEX_MAP[${sample}]}
-#         cmsenv # set CMSSW environment
-#         run_skim --isdata 1 -i ${DATA_DIR} --sample ${REGEX_MAP[${sample}]} ${DATA_MAP[${ds}]}
-#         cmsenv # set CMSSW environment
-#     fi
-# done
+# Skimming submission
+for ds in ${!DATA_MAP[@]}; do
+    if [ ${#LISTS_DATA[@]} -eq 0 ]; then
+        echo "WARNING: No files found in "${LIST_DATA_DIR}"."
+    fi
+    sample=$(find_sample ${ds} ${LIST_DATA_DIR} ${#LISTS_DATA[@]} ${LISTS_DATA[@]})
+    if [[ ${sample} =~ ${SEARCH_SPACE} ]]; then
+        ERRORS+=( ${sample} )
+    else
+        eval `scram unsetenv -sh` # unset CMSSW environment
+        [[ ${NO_LISTS} -eq 0 ]] && produce_list --kind Data --sample ${sample} --outtxt ${REGEX_MAP[${sample}]}
+        cmsenv # set CMSSW environment
+        run_skim --isdata 1 -i ${DATA_DIR} --sample ${REGEX_MAP[${sample}]} ${DATA_MAP[${ds}]}
+        cmsenv # set CMSSW environment
+    fi
+done
 
 ### Run on HH resonant signal samples
 LIST_SIG_DIR=${LIST_DIR}${IN_TAG}
@@ -459,19 +459,19 @@ cmsenv # set CMSSW environment
 
 DATA_LIST=( "GluGluToRad" "GluGluToBulkGrav" )
 MASSES=("250" "260" "270" "280" "300" "320" "350" "400" "450" "500" "550" "600" "650" "700" "750" "800" "850" "900" "1000" "1250" "1500" "1750" "2000" "2500" "3000")
-# for ds in ${DATA_LIST[@]}; do
-#     for mass in ${MASSES[@]}; do
-#         pattern="${ds}.+_M-${mass}_";
-#         sample=$(find_sample ${pattern} ${LIST_SIG_DIR} ${#LISTS_SIG[@]} ${LISTS_SIG[@]})
-#         if [[ ${sample} =~ ${SEARCH_SPACE} ]]; then
-#             ERRORS+=( ${sample} )
-#         else
-#             [[ ${NO_LISTS} -eq 0 ]] && produce_list --kind Sig --sample ${sample} --outtxt ${REGEX_MAP[${sample}]}
-#             echo ${sample}
-#             run_skim -n 5 -i ${SIG_DIR} --sample ${REGEX_MAP[${sample}]} -x 1. -q short
-#         fi
-#     done
-# done
+for ds in ${DATA_LIST[@]}; do
+    for mass in ${MASSES[@]}; do
+        pattern="${ds}.+_M-${mass}_";
+        sample=$(find_sample ${pattern} ${LIST_SIG_DIR} ${#LISTS_SIG[@]} ${LISTS_SIG[@]})
+        if [[ ${sample} =~ ${SEARCH_SPACE} ]]; then
+            ERRORS+=( ${sample} )
+        else
+            [[ ${NO_LISTS} -eq 0 ]] && produce_list --kind Sig --sample ${sample} --outtxt ${REGEX_MAP[${sample}]}
+            echo ${sample}
+            run_skim -n 5 -i ${SIG_DIR} --sample ${REGEX_MAP[${sample}]} -x 1. -q short
+        fi
+    done
+done
 
 ### Run on backgrounds samples
 # ttbar inclusive cross-section: 791 +- 25 pb (https://arxiv.org/pdf/2108.02803.pdf)
@@ -484,21 +484,21 @@ ZH_HToBB_ZToQQ_BR=`echo "0.69911*0.5824" | bc`
 ZH_HToBB_ZToLL_BR=`echo "(0.033696 +0.033662 + 0.033632)*0.5824" | bc`
 
 MC_MAP=(
-    # ["TTToHadronic"]="-n 100 -x ${FullyHadXSec} --rt 4"
-    # ["TTTo2L2Nu"]="-n 100 -x ${FullyLepXSec} --rt 24"
-    # ["TTToSemiLeptonic"]="-n 100 -x ${SemiLepXSec} --rt 24"
+    ["TTToHadronic"]="-n 100 -x ${FullyHadXSec} --rt 4"
+    ["TTTo2L2Nu"]="-n 100 -x ${FullyLepXSec} --rt 24"
+    ["TTToSemiLeptonic"]="-n 100 -x ${SemiLepXSec} --rt 24"
 
-    # ["DYJets.+_M-50_T.+amc"]="-n 300 -x 6077.22 -g ${STITCHING_ON} --DY 0 --rt 4" # inclusive NLO
-    # ["DYJets.+_M-10to50"]="-n 300 -x 20490.0 --DY 0 --rt 4" # low mass
-    # ["DYJetsToLL_LHEFilterPtZ-0To50"]="-n 300    -x 1409.22 -g ${STITCHING_ON} --DY 0 --rt 24"
-    # ["DYJetsToLL_LHEFilterPtZ-50To100"]="-n 300  -x 377.12  -g ${STITCHING_ON} --DY 0 --rt 24"
-    # ["DYJetsToLL_LHEFilterPtZ-100To250"]="-n 300 -x 92.24   -g ${STITCHING_ON} --DY 0 --rt 24"
-    # ["DYJetsToLL_LHEFilterPtZ-250To400"]="-n 300 -x 3.512   -g ${STITCHING_ON} --DY 0 --rt 4" # some jobs are killed even with a single file (in the short queue)
-    # ["DYJetsToLL_LHEFilterPtZ-400To650"]="-n 300 -x 0.4826  -g ${STITCHING_ON} --DY 0 --rt 4"
-    # ["DYJetsToLL_LHEFilterPtZ-650ToInf"]="-n 300 -x 0.04487 -g ${STITCHING_ON} --DY 0 --rt 4"
-    # ["DYJetsToLL_0J"]="-n 300 -x 4867.28  -g ${STITCHING_ON} --DY 0 --rt 4"
-    # ["DYJetsToLL_1J"]="-n 300 -x 902.95   -g ${STITCHING_ON} --DY 0 --rt 4"
-    # ["DYJetsToLL_2J"]="-n 300 -x 342.96   -g ${STITCHING_ON} --DY 0 --rt 4"
+    ["DYJets.+_M-50_T.+amc"]="-n 300 -x 6077.22 -g ${STITCHING_ON} --DY 0 --rt 4" # inclusive NLO
+    ["DYJets.+_M-10to50"]="-n 300 -x 20490.0 --DY 0 --rt 4" # low mass
+    ["DYJetsToLL_LHEFilterPtZ-0To50"]="-n 300    -x 1409.22 -g ${STITCHING_ON} --DY 0 --rt 24"
+    ["DYJetsToLL_LHEFilterPtZ-50To100"]="-n 300  -x 377.12  -g ${STITCHING_ON} --DY 0 --rt 24"
+    ["DYJetsToLL_LHEFilterPtZ-100To250"]="-n 300 -x 92.24   -g ${STITCHING_ON} --DY 0 --rt 24"
+    ["DYJetsToLL_LHEFilterPtZ-250To400"]="-n 300 -x 3.512   -g ${STITCHING_ON} --DY 0 --rt 4" # some jobs are killed even with a single file (in the short queue)
+    ["DYJetsToLL_LHEFilterPtZ-400To650"]="-n 300 -x 0.4826  -g ${STITCHING_ON} --DY 0 --rt 4"
+    ["DYJetsToLL_LHEFilterPtZ-650ToInf"]="-n 300 -x 0.04487 -g ${STITCHING_ON} --DY 0 --rt 4"
+    ["DYJetsToLL_0J"]="-n 300 -x 4867.28  -g ${STITCHING_ON} --DY 0 --rt 4"
+    ["DYJetsToLL_1J"]="-n 300 -x 902.95   -g ${STITCHING_ON} --DY 0 --rt 4"
+    ["DYJetsToLL_2J"]="-n 300 -x 342.96   -g ${STITCHING_ON} --DY 0 --rt 4"
 
     ["WJetsToLNu_T.+madgraph"]="-n 20 -x 48917.48 -y 1.213784 -z 70 --rt 4" # for 0 < HT < 70
     ["WJetsToLNu_HT-70To100"]="-n 20 -x 1362 -y 1.213784 --rt 4"
