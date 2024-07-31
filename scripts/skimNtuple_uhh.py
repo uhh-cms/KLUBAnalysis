@@ -59,7 +59,7 @@ def write_condor_file(d, condor_name, shell_exec, c_exec, py_exec,
 
     with open(condor_name, 'w') as s:
         s.write('\n'.join(('Universe = vanilla',
-                           'Request_OpSysAndVer = "CentOS7"\n',
+                           '+MySingularityImage = "/cvmfs/unpacked.cern.ch/registry.hub.docker.com/cmssw/cc7:x86_64"\n'
                            '+RequestRuntime = {}\n'.format(
                                int(FLAGS.runtime * 3600) - 1),
                            'Executable = {}'.format(shell_exec),
