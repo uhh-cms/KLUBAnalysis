@@ -226,8 +226,8 @@ int main (int argc, char** argv)
   }
   
   // for boosted corrections
-  bool isDYlike = argv[34];
-  bool isTTlike = argv[35];
+  int isDYlike = atoi(argv[34]);
+  int isTTlike = atoi(argv[35]);
   cout << "** INFO: boosted corrections - is DY like process : "<< isDYlike <<endl;
   cout << "                             - is ttbar like process : "<<isTTlike <<endl;
   
@@ -487,7 +487,6 @@ int main (int argc, char** argv)
 	wpyear = "2016";
   }
   bTagSF bTagSFHelper(bTag_SFFile, bTag_effFile, "", wpyear, wpset, isMC);
-
 
   // ------------------------------
   std::string PUjetID_SF_directory = home + gConfigParser->readStringOption("PUjetIDScaleFactors::files");
@@ -1973,6 +1972,7 @@ int main (int argc, char** argv)
 		  bool legacyAccept    = passTrg       and trgRegions["legacy"];
 		  bool metAccept       = passMETTrg    and trgRegions["met"]; 
 		  bool singletauAccept = passSingleTau and trgRegions["tau"];
+
 		  if (!isMC) {
 			legacyAccept    = legacyAccept    and !isMETDataset and (!isTauDataset or pType==2);
 			metAccept       = metAccept       and isMETDataset;
@@ -5461,10 +5461,10 @@ int main (int argc, char** argv)
 		  if (matchedToHiggs || matchedToZ){
 		    sample_type = "HHlike";
 		  }
-		  else if  (isDYlike){
+		  else if  (isDYlike==1){
 		    sample_type = "DYlike";
 		  }
-		  else if (isTTlike){
+		  else if (isTTlike==1){
 		    sample_type = "TTlike";
 		  }
 		  

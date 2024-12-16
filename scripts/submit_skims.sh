@@ -491,9 +491,9 @@ elif [ ${DATA_PERIOD} == "UL16" ]; then
 		["Tau__Run2016G"]="-n 10 -q long --datasetType 2"
 		["Tau__Run2016H"]="-n 10 -q long --datasetType 2"
 		
-		["SingleMuon__Run2016F"]="-n 20 -q long"
-		["SingleMuon__Run2016G"]="-n 20 -q long"
-		["SingleMuon__Run2016H"]="-n 20 -q long"
+		["SingleMuon__Run2016F"]="-n 30 -q long"
+		["SingleMuon__Run2016G"]="-n 30 -q long"
+		["SingleMuon__Run2016H"]="-n 30 -q long"
 		
 		["MET__Run2016F"]="-n 10 -q long --datasetType 1"
 		["MET__Run2016G"]="-n 10 -q long --datasetType 1"
@@ -528,21 +528,21 @@ elif [ ${DATA_PERIOD} == "UL16APV" ]; then
 fi
 	
 # Skimming submission
-for ds in ${!DATA_MAP[@]}; do
-	if [ ${#LISTS_DATA[@]} -eq 0 ]; then
-		echo "WARNING: No files found in "${LIST_DATA_DIR}"."
-	fi
-    sample=$(find_sample ${ds} ${LIST_DATA_DIR} ${#LISTS_DATA[@]} ${LISTS_DATA[@]})
-    if [[ ${sample} =~ ${SEARCH_SPACE} ]]; then
-		ERRORS+=( ${sample} )
-    else
-		eval `scram unsetenv -sh` # unset CMSSW environment
-		[[ ${NO_LISTS} -eq 0 ]] && produce_list --kind Data --sample ${sample} --outtxt ${REGEX_MAP[${sample}]}
-		cmsenv # set CMSSW environment
-		run_skim --isdata 1 -i ${DATA_DIR} --sample ${REGEX_MAP[${sample}]} ${DATA_MAP[${ds}]}
-		cmsenv # set CMSSW environment
-    fi
-done
+# for ds in ${!DATA_MAP[@]}; do
+# 	if [ ${#LISTS_DATA[@]} -eq 0 ]; then
+# 		echo "WARNING: No files found in "${LIST_DATA_DIR}"."
+# 	fi
+#     sample=$(find_sample ${ds} ${LIST_DATA_DIR} ${#LISTS_DATA[@]} ${LISTS_DATA[@]})
+#     if [[ ${sample} =~ ${SEARCH_SPACE} ]]; then
+# 		ERRORS+=( ${sample} )
+#     else
+# 		eval `scram unsetenv -sh` # unset CMSSW environment
+# 		[[ ${NO_LISTS} -eq 0 ]] && produce_list --kind Data --sample ${sample} --outtxt ${REGEX_MAP[${sample}]}
+# 		cmsenv # set CMSSW environment
+# 		run_skim --isdata 1 -i ${DATA_DIR} --sample ${REGEX_MAP[${sample}]} ${DATA_MAP[${ds}]}
+# 		cmsenv # set CMSSW environment
+#     fi
+# done
 
 ### Run on HH resonant signal samples
 LIST_SIG_DIR=${LIST_DIR}"Sig_"${IN_TAG}
@@ -550,8 +550,10 @@ eval `scram unsetenv -sh` # unset CMSSW environment
 declare -a LISTS_SIG=( $(/usr/bin/gfal-ls -lH ${LIST_SIG_DIR} | awk '{{printf $9" "}}') )
 cmsenv # set CMSSW environment
 
-DATA_LIST=( "GluGluToRad" "GluGluToBulkGrav" )
-MASSES=("250" "260" "270" "280" "300" "320" "350" "400" "450" "500" "550" "600" "650" "700" "750" "800" "850" "900" "1000" "1250" "1500" "1750" "2000" "2500" "3000")
+# DATA_LIST=( "GluGluToRad" "GluGluToBulkGrav" )
+# MASSES=("250" "260" "270" "280" "300" "320" "350" "400" "450" "500" "550" "600" "650" "700" "750" "800" "850" "900" "1000" "1250" "1500" "1750" "2000" "2500" "3000")
+DATA_LIST=( "GluGluToRad" )
+MASSES=("1000")
 for ds in ${DATA_LIST[@]}; do
 	for mass in ${MASSES[@]}; do
 		pattern="${ds}.+_M-${mass}_";
@@ -560,7 +562,6 @@ for ds in ${DATA_LIST[@]}; do
 			ERRORS+=( ${sample} )
 		else
 			[[ ${NO_LISTS} -eq 0 ]] && produce_list --kind Sig --sample ${sample} --outtxt ${REGEX_MAP[${sample}]}
-			echo ${sample}
 			run_skim -n 5 -i ${SIG_DIR} --sample ${REGEX_MAP[${sample}]} -x 1. -q long --ishhsignal 1
 		fi
 	done
@@ -617,8 +618,8 @@ MC_MAP=(
     ["WminusHToTauTau"]="-n 30 -x 0.527 -y 0.06272 -q short --isDYlike"
     ["ZHToTauTau"]="-n 30 -x 0.880 -y 0.06272 -q short  --isDYlike"
 
-    ["ZH_HToBB_ZToLL"]="-n 100 -x 0.880 -y ${ZH_HToBB_ZToLL_BR} -q short"
-    ["ZH_HToBB_ZToQQ"]="-n 30 -x 0.880 -y ${ZH_HToBB_ZToQQ_BR} -q short"
+    ["ZH_HToBB_ZToLL"]="-n 100 -x 0.880 -y ${ZH_HToBB_ZToLL_BR} -q short --isDYlike"
+    ["ZH_HToBB_ZToQQ"]="-n 30 -x 0.880 -y ${ZH_HToBB_ZToQQ_BR} -q short --isDYlike"
     
     ["_WW_TuneCP5"]="-n 30 -x 118.7 -q short --isDYlike"
     ["_WZ_TuneCP5"]="-n 30 -x 47.13 -q short --isDYlike"
@@ -642,17 +643,17 @@ MC_MAP=(
     ["TTWH"]="-n 6 -x 0.001143 -q short --isTTlike"
     ["TTZH"]="-n 15 -x 0.001136 -q short --isTTlike"
 
-    ["GluGluToHHTo2B2Tau"]="-n 10 -x 0.01618 -q short"
+    ["GluGluToHHTo2B2Tau"]="-n 10 -x 0.01618 -q short --isDYlike"
 )
 if [ ${DATA_PERIOD} == "UL18" ] || [ ${DATA_PERIOD} == "UL17" ] || [ ${DATA_PERIOD} == "UL16APV" ]; then
     MC_MAP+=(
 		["ttHToNonbb"]="-n 100 -x 0.5071 -y 0.3598 -q short --isTTlike"
-		["ttHTobb"]="-n 120 -x 0.5071 -y 0.577 -q short"
+		["ttHTobb"]="-n 120 -x 0.5071 -y 0.577 -q short --isTTlike"
 	)
 elif [ ${DATA_PERIOD} == "UL16" ]; then
     MC_MAP+=(
 		["ttHJetToNonbb"]="-n 100 -x 0.5071 -y 0.3598 -q short --isTTlike"
-		["ttHJetTobb"]="-n 120 -x 0.5071 -y 0.577 -q short"
+		["ttHJetTobb"]="-n 120 -x 0.5071 -y 0.577 -q short --isTTlike"
 	)
 fi
 
