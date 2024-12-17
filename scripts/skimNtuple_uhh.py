@@ -249,7 +249,9 @@ def skim_ntuple(FLAGS, curr_folder):
                                        yes_or_no(FLAGS.ttHToNonBB),
                                        yes_or_no(FLAGS.hhNLO),
                                        FLAGS.year,
-                                       str(FLAGS.datasetType))
+                                       str(FLAGS.datasetType),
+                                       yes_or_no(FLAGS.isDYlike),
+                                       yes_or_no(FLAGS.isTTlike))
 
         s.write(comment + '\n')
 
@@ -393,6 +395,9 @@ if __name__ == "__main__":
                         action='store_true', help='if it is an HH NLO sample')
     parser.add_argument('--doSyst', default=False, action='store_true',
                         help='compute up/down values of outputs')
+
+    parser.add_argument('--isDYlike', help="Boosted corrections : if the process is of the kind V+jets", default=False, action='store_true')
+    parser.add_argument('--isTTlike', help="Boosted corrections : if the process is top-enriched", default=False, action='store_true')
 
     FLAGS = parser.parse_args()
     if not FLAGS.isdata:
