@@ -468,7 +468,7 @@ for ds in ${DATA_LIST[@]}; do
         else
             [[ ${NO_LISTS} -eq 0 ]] && produce_list --kind Sig --sample ${sample} --outtxt ${REGEX_MAP[${sample}]}
             echo ${sample}
-            run_skim -n 5 -i ${SIG_DIR} --sample ${REGEX_MAP[${sample}]} -x 1. -q short
+            run_skim -n 5 -i ${SIG_DIR} --sample ${REGEX_MAP[${sample}]} -x 1. --rt 4
         fi
     done
 done
@@ -484,75 +484,75 @@ ZH_HToBB_ZToQQ_BR=`echo "0.69911*0.5824" | bc`
 ZH_HToBB_ZToLL_BR=`echo "(0.033696 +0.033662 + 0.033632)*0.5824" | bc`
 
 MC_MAP=(
-    ["TTToHadronic"]="-n 100 -x ${FullyHadXSec} --rt 4"
-    ["TTTo2L2Nu"]="-n 100 -x ${FullyLepXSec} --rt 24"
-    ["TTToSemiLeptonic"]="-n 100 -x ${SemiLepXSec} --rt 24"
+    ["TTToHadronic"]="-n 100 -x ${FullyHadXSec} --rt 4 --isTTlike"
+    ["TTTo2L2Nu"]="-n 100 -x ${FullyLepXSec} --rt 24 --isTTlike"
+    ["TTToSemiLeptonic"]="-n 100 -x ${SemiLepXSec} --rt 24 --isTTlike"
 
-    ["DYJets.+_M-50_T.+amc"]="-n 300 -x 6077.22 -g ${STITCHING_ON} --DY 0 --rt 4" # inclusive NLO
-    ["DYJets.+_M-10to50"]="-n 300 -x 20490.0 --DY 0 --rt 4" # low mass
-    ["DYJetsToLL_LHEFilterPtZ-0To50"]="-n 300    -x 1409.22 -g ${STITCHING_ON} --DY 0 --rt 24"
-    ["DYJetsToLL_LHEFilterPtZ-50To100"]="-n 300  -x 377.12  -g ${STITCHING_ON} --DY 0 --rt 24"
-    ["DYJetsToLL_LHEFilterPtZ-100To250"]="-n 300 -x 92.24   -g ${STITCHING_ON} --DY 0 --rt 24"
-    ["DYJetsToLL_LHEFilterPtZ-250To400"]="-n 300 -x 3.512   -g ${STITCHING_ON} --DY 0 --rt 4" # some jobs are killed even with a single file (in the short queue)
-    ["DYJetsToLL_LHEFilterPtZ-400To650"]="-n 300 -x 0.4826  -g ${STITCHING_ON} --DY 0 --rt 4"
-    ["DYJetsToLL_LHEFilterPtZ-650ToInf"]="-n 300 -x 0.04487 -g ${STITCHING_ON} --DY 0 --rt 4"
-    ["DYJetsToLL_0J"]="-n 300 -x 4867.28  -g ${STITCHING_ON} --DY 0 --rt 4"
-    ["DYJetsToLL_1J"]="-n 300 -x 902.95   -g ${STITCHING_ON} --DY 0 --rt 4"
-    ["DYJetsToLL_2J"]="-n 300 -x 342.96   -g ${STITCHING_ON} --DY 0 --rt 4"
+    ["DYJets.+_M-50_T.+amc"]="-n 300 -x 6077.22 -g ${STITCHING_ON} --DY 0 --rt 4 --isDYlike" # inclusive NLO
+    ["DYJets.+_M-10to50"]="-n 300 -x 20490.0 --DY 0 --rt 4 --isDYlike" # low mass
+    ["DYJetsToLL_LHEFilterPtZ-0To50"]="-n 300    -x 1409.22 -g ${STITCHING_ON} --DY 0 --rt 24 --isDYlike"
+    ["DYJetsToLL_LHEFilterPtZ-50To100"]="-n 300  -x 377.12  -g ${STITCHING_ON} --DY 0 --rt 24 --isDYlike"
+    ["DYJetsToLL_LHEFilterPtZ-100To250"]="-n 300 -x 92.24   -g ${STITCHING_ON} --DY 0 --rt 24 --isDYlike"
+    ["DYJetsToLL_LHEFilterPtZ-250To400"]="-n 300 -x 3.512   -g ${STITCHING_ON} --DY 0 --rt 4 --isDYlike" # some jobs are killed even with a single file (in the short queue)
+    ["DYJetsToLL_LHEFilterPtZ-400To650"]="-n 300 -x 0.4826  -g ${STITCHING_ON} --DY 0 --rt 4 --isDYlike"
+    ["DYJetsToLL_LHEFilterPtZ-650ToInf"]="-n 300 -x 0.04487 -g ${STITCHING_ON} --DY 0 --rt 4 --isDYlike"
+    ["DYJetsToLL_0J"]="-n 300 -x 4867.28  -g ${STITCHING_ON} --DY 0 --rt 4 --isDYlike"
+    ["DYJetsToLL_1J"]="-n 300 -x 902.95   -g ${STITCHING_ON} --DY 0 --rt 4 --isDYlike"
+    ["DYJetsToLL_2J"]="-n 300 -x 342.96   -g ${STITCHING_ON} --DY 0 --rt 4 --isDYlike"
 
-    ["WJetsToLNu_T.+madgraph"]="-n 20 -x 48917.48 -y 1.213784 -z 70 --rt 4" # for 0 < HT < 70
-    ["WJetsToLNu_HT-70To100"]="-n 20 -x 1362 -y 1.213784 --rt 4"
-    ["WJetsToLNu_HT-100To200"]="-n 20 -x 1345 -y 1.213784 --rt 4"
-    ["WJetsToLNu_HT-200To400"]="-n 20 -x 359.7 -y 1.213784 --rt 4"
-    ["WJetsToLNu_HT-400To600"]="-n 20 -x 48.91 -y 1.213784 --rt 4"
-    ["WJetsToLNu_HT-600To800"]="-n 20 -x 12.05 -y 1.213784 --rt 4"
-    ["WJetsToLNu_HT-800To1200"]="-n 20 -x 5.501 -y 1.213784 --rt 4"
-    ["WJetsToLNu_HT-1200To2500"]="-n 20 -x 1.329 -y 1.213784 --rt 4"
-    ["WJetsToLNu_HT-2500ToInf"]="-n 20 -x 0.03216 -y 1.213784 --rt 4"
+    ["WJetsToLNu_T.+madgraph"]="-n 20 -x 48917.48 -y 1.213784 -z 70 --rt 4 --isDYlike" # for 0 < HT < 70
+    ["WJetsToLNu_HT-70To100"]="-n 20 -x 1362 -y 1.213784 --rt 4 --isDYlike"
+    ["WJetsToLNu_HT-100To200"]="-n 20 -x 1345 -y 1.213784 --rt 4 --isDYlike"
+    ["WJetsToLNu_HT-200To400"]="-n 20 -x 359.7 -y 1.213784 --rt 4 --isDYlike"
+    ["WJetsToLNu_HT-400To600"]="-n 20 -x 48.91 -y 1.213784 --rt 4 --isDYlike"
+    ["WJetsToLNu_HT-600To800"]="-n 20 -x 12.05 -y 1.213784 --rt 4 --isDYlike"
+    ["WJetsToLNu_HT-800To1200"]="-n 20 -x 5.501 -y 1.213784 --rt 4 --isDYlike"
+    ["WJetsToLNu_HT-1200To2500"]="-n 20 -x 1.329 -y 1.213784 --rt 4 --isDYlike"
+    ["WJetsToLNu_HT-2500ToInf"]="-n 20 -x 0.03216 -y 1.213784 --rt 4 --isDYlike"
 
-    ["EWKWPlus2Jets_WToLNu"]="-n 100 -x 25.62 --rt 4"
-    ["EWKWMinus2Jets_WToLNu"]="-n 100 -x 20.25 --rt 4"
-    ["EWKZ2Jets_ZToLL"]="-n 100 -x 3.987 --rt 4"
+    ["EWKWPlus2Jets_WToLNu"]="-n 100 -x 25.62 --rt 4 --isDYlike"
+    ["EWKWMinus2Jets_WToLNu"]="-n 100 -x 20.25 --rt 4 --isDYlike"
+    ["EWKZ2Jets_ZToLL"]="-n 100 -x 3.987 --rt 4 --isDYlike"
 
-    ["ST_tW_antitop_5f_inclusive"]="-n 80 -x 35.85 --rt 4"
-    ["ST_tW_top_5f_inclusive"]="-n 80 -x 35.85 --rt 4"
-    ["ST_t-channel_antitop"]="-n 80 -x 80.95 --rt 4"
-    ["ST_t-channel_top"]="-n 80 -x 136.02 --rt 4"
+    ["ST_tW_antitop_5f_inclusive"]="-n 80 -x 35.85 --rt 4 --isTTlike"
+    ["ST_tW_top_5f_inclusive"]="-n 80 -x 35.85 --rt 4 --isTTlike"
+    ["ST_t-channel_antitop"]="-n 80 -x 80.95 --rt 4 --isTTlike"
+    ["ST_t-channel_top"]="-n 80 -x 136.02 --rt 4 --isTTlike"
 
-    ["GluGluHToTauTau"]="-n 30 -x 48.68 -y 0.06272 --rt 4"
-    ["VBFHToTauTau"]="-n 30 -x 3.766 -y 0.06272 --rt 4"
-    ["WplusHToTauTau"]="-n 30 -x 0.831 -y 0.06272 --rt 4"
-    ["WminusHToTauTau"]="-n 30 -x 0.527 -y 0.06272 --rt 4"
-    ["ZHToTauTau"]="-n 30 -x 0.880 -y 0.06272 --rt 4"
+    ["GluGluHToTauTau"]="-n 30 -x 48.68 -y 0.06272 --rt 4 --isDYlike"
+    ["VBFHToTauTau"]="-n 30 -x 3.766 -y 0.06272 --rt 4 --isDYlike"
+    ["WplusHToTauTau"]="-n 30 -x 0.831 -y 0.06272 --rt 4 --isDYlike"
+    ["WminusHToTauTau"]="-n 30 -x 0.527 -y 0.06272 --rt 4 --isDYlike"
+    ["ZHToTauTau"]="-n 30 -x 0.880 -y 0.06272 --rt 4 --isDYlike"
 
-    ["^ZH_HToBB_ZToLL"]="-n 30 -x 0.880 -y ${ZH_HToBB_ZToLL_BR} --rt 4"
-    ["ZH_HToBB_ZToQQ"]="-n 30 -x 0.880 -y ${ZH_HToBB_ZToQQ_BR} --rt 4"
+    ["^ZH_HToBB_ZToLL"]="-n 30 -x 0.880 -y ${ZH_HToBB_ZToLL_BR} --rt 4 --isDYlike"
+    ["ZH_HToBB_ZToQQ"]="-n 30 -x 0.880 -y ${ZH_HToBB_ZToQQ_BR} --rt 4 --isDYlike"
 
-    ["ttHToNonbb"]="-n 100 -x 0.5071 -y 0.3598 -q short"
-    ["ttHTobb"]="-n 100 -x 0.5071 -y 0.577 -q short"
-    ["ttHToTauTau"]="-n 500 -x 0.5071 -y 0.0632 -q short"
+    ["ttHToNonbb"]="-n 100 -x 0.5071 -y 0.3598 --rt 4 --isTTlike"
+    ["ttHTobb"]="-n 100 -x 0.5071 -y 0.577 --rt 4 --isTTlike"
+    ["ttHToTauTau"]="-n 500 -x 0.5071 -y 0.0632 --rt 4 --isTTlike"
 
-    ["^WW_TuneCP5"]="-n 30 -x 118.7 -q short"
-    ["^WZ_TuneCP5"]="-n 30 -x 47.13 -q short"
-    ["^ZZ_TuneCP5"]="-n 30 -x 16.523 -q short"
+    ["^WW_TuneCP5"]="-n 30 -x 118.7 --rt 4 --isDYlike"
+    ["^WZ_TuneCP5"]="-n 30 -x 47.13 --rt 4 --isDYlike"
+    ["^ZZ_TuneCP5"]="-n 30 -x 16.523 --rt 4 --isDYlike"
 
-    ["WWW"]="-n 20 -x 0.209 --rt 4"
-    ["WWZ"]="-n 20 -x 0.168 --rt 4"
-    ["WZZ"]="-n 20 -x 0.057 --rt 4"
-    ["ZZZ"]="-n 20 -x 0.0147 --rt 4"
+    ["WWW"]="-n 20 -x 0.209 --rt 4 --isDYlike"
+    ["WWZ"]="-n 20 -x 0.168 --rt 4 --isDYlike"
+    ["WZZ"]="-n 20 -x 0.057 --rt 4 --isDYlike"
+    ["ZZZ"]="-n 20 -x 0.0147 --rt 4 --isDYlike"
 
-    ["TTWJetsToLNu"]="-n 20 -x 0.2043 --rt 4"
-    ["TTWJetsToQQ"]="-n 20 -x 0.4062 --rt 4"
-    ["TTZToLLNuNu"]="-n 20 -x 0.2529 --rt 24"
-    ["TTZToQQ"]="-n 20 -x 0.5104 --rt 24"
-    ["TTWW"]="-n 20 -x 0.006979 --rt 4"
-    ["TTZZ"]="-n 20 -x 0.001386 --rt 4"
-    ["TTWZ"]="-n 20 -x 0.00158 --rt 4"
+    ["TTWJetsToLNu"]="-n 20 -x 0.2043 --rt 4 --isTTlike"
+    ["TTWJetsToQQ"]="-n 20 -x 0.4062 --rt 4 --isTTlike"
+    ["TTZToLLNuNu"]="-n 20 -x 0.2529 --rt 24 --isTTlike"
+    ["TTZToQQ"]="-n 20 -x 0.5104 --rt 24 --isTTlike"
+    ["TTWW"]="-n 20 -x 0.006979 --rt 4 --isTTlike"
+    ["TTZZ"]="-n 20 -x 0.001386 --rt 4 --isTTlike"
+    ["TTWZ"]="-n 20 -x 0.00158 --rt 4 --isTTlike"
 
-    ["TTWH"]="-n 20 -x 0.001143 --rt 4"
-    ["TTZH"]="-n 20 -x 0.001136 --rt 4"
+    ["TTWH"]="-n 20 -x 0.001143 --rt 4 --isTTlike"
+    ["TTZH"]="-n 20 -x 0.001136 --rt 4 --isTTlike"
 
-    ["GluGluToHHTo2B2Tau_TuneCP5_PSWeights_node_SM"]="-n 20 -x 0.01618 --rt 5"
+    ["GluGluToHHTo2B2Tau_TuneCP5_PSWeights_node_SM"]="-n 20 -x 0.01618 --rt 5 --isDYlike"
 )
 
 # Sanity checks for Drell-Yan stitching
