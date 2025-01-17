@@ -410,6 +410,10 @@ int main (int argc, char** argv)
   int selectedNoWeightsEventsNum = 0 ;
   float totalEvents_PUReweight_up = 0 ;
   float totalEvents_PUReweight_down = 0 ;
+  std::vector<float> totalEvents_QCDscale(theBigTree.MC_QCDscale.size(), 0);
+  std::vector<float> totalEvents_pdf(theBigTree.MC_pdf.size(), 0);
+  std::vector<float> totalEvents_alphaS(theBigTree.MC_astrong.size(), 0);
+
 
   // ------------------------------
   // systematics
@@ -1264,6 +1268,9 @@ int main (int argc, char** argv)
 	  float EvtW = 1.;
 	  float EvtW_PUReweight_up = 1.;
 	  float EvtW_PUReweight_down = 1.;
+	  std::vector<float> EvtW_QCDscale(totalEvents_QCDscale.size(), 1.);
+	  std::vector<float> EvtW_pdf(totalEvents_pdf.size(), 1.);
+	  std::vector<float> EvtW_alphaS(totalEvents_alphaS.size(), 1.);
 	  theSmallTree.m_PUReweight  = 1.;
 	  theSmallTree.m_PUReweight_up = 1.;
 	  theSmallTree.m_PUReweight_down = 1.;
@@ -1275,15 +1282,20 @@ int main (int argc, char** argv)
 		theSmallTree.m_PUReweight = reweight.weight(PUReweight_MC, PUReweight_target, npu, PUreweightFile);
 		theSmallTree.m_PUReweight_up = reweight_up.weight(PUReweight_MC, PUReweight_target, npu, PUreweightFile_up);
 		theSmallTree.m_PUReweight_down = reweight_down.weight(PUReweight_MC, PUReweight_target, npu, PUreweightFile_down);
-
-		EvtW = theBigTree.aMCatNLOweight * theSmallTree.m_PUReweight * topPtReweight * HHweight;
+		float EvtW_fixed = theSmallTree.m_PUReweight * topPtReweight * HHweight;
+		EvtW = theBigTree.aMCatNLOweight * EvtW_fixed;
 		EvtW_PUReweight_up = theBigTree.aMCatNLOweight * theSmallTree.m_PUReweight_up * topPtReweight * HHweight;
 		EvtW_PUReweight_down = theBigTree.aMCatNLOweight * theSmallTree.m_PUReweight_down * topPtReweight * HHweight;
+		for(uint i = 0; i < totalEvents_QCDscale.size(); i++) EvtW_QCDscale[i] = theBigTree.MC_QCDscale[i] != 0 ? theBigTree.MC_QCDscale[i] * EvtW_fixed : EvtW;
+		for(uint i = 0; i < totalEvents_pdf.size(); i++) EvtW_pdf[i] = theBigTree.MC_pdf[i] != 0 ? theBigTree.MC_pdf[i] * EvtW_fixed : EvtW;
+		for(uint i = 0; i < totalEvents_alphaS.size(); i++) EvtW_alphaS[i] = theBigTree.MC_astrong[i] != 0 ? theBigTree.MC_astrong[i] * EvtW_fixed : EvtW;
 	  }
 	  totalEvents += EvtW;
 	  totalEvents_PUReweight_up += EvtW_PUReweight_up;
 	  totalEvents_PUReweight_down += EvtW_PUReweight_down;
-
+	  for(uint i = 0; i < totalEvents_QCDscale.size(); i++) totalEvents_QCDscale[i] += EvtW_QCDscale[i];
+	  for(uint i = 0; i < totalEvents_pdf.size(); i++) totalEvents_pdf[i] += EvtW_pdf[i];
+	  for(uint i = 0; i < totalEvents_alphaS.size(); i++) totalEvents_alphaS[i] += EvtW_alphaS[i];
 
 	  ec.Increment("all", EvtW);
 	  if (isHHsignal) {
@@ -2172,118 +2184,118 @@ int main (int argc, char** argv)
 	  theSmallTree.m_MC_weight = (isMC ? theBigTree.aMCatNLOweight * MC_weight_fixed : 1);
 	  theSmallTree.m_MC_weight_fixed = (isMC ? MC_weight_fixed : 1);
 
-	  theSmallTree.m_MC_QCDscale0 = (isMC ? theBigTree.MC_QCDscale[0] : 1.);
-	  theSmallTree.m_MC_QCDscale1 = (isMC ? theBigTree.MC_QCDscale[1] : 1.);
-	  theSmallTree.m_MC_QCDscale2 = (isMC ? theBigTree.MC_QCDscale[2] : 1.);
-	  theSmallTree.m_MC_QCDscale3 = (isMC ? theBigTree.MC_QCDscale[3] : 1.);
-	  theSmallTree.m_MC_QCDscale4 = (isMC ? theBigTree.MC_QCDscale[4] : 1.);
-	  theSmallTree.m_MC_QCDscale5 = (isMC ? theBigTree.MC_QCDscale[5] : 1.);
-	  theSmallTree.m_MC_QCDscale6 = (isMC ? theBigTree.MC_QCDscale[6] : 1.);
+	  theSmallTree.m_MC_QCDscale0 = (isMC ? (theBigTree.MC_QCDscale[0] != 0 ? theBigTree.MC_QCDscale[0] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_QCDscale1 = (isMC ? (theBigTree.MC_QCDscale[1] != 0 ? theBigTree.MC_QCDscale[1] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_QCDscale2 = (isMC ? (theBigTree.MC_QCDscale[2] != 0 ? theBigTree.MC_QCDscale[2] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_QCDscale3 = (isMC ? (theBigTree.MC_QCDscale[3] != 0 ? theBigTree.MC_QCDscale[3] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_QCDscale4 = (isMC ? (theBigTree.MC_QCDscale[4] != 0 ? theBigTree.MC_QCDscale[4] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_QCDscale5 = (isMC ? (theBigTree.MC_QCDscale[5] != 0 ? theBigTree.MC_QCDscale[5] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_QCDscale6 = (isMC ? (theBigTree.MC_QCDscale[6] != 0 ? theBigTree.MC_QCDscale[6] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
 
-	  theSmallTree.m_MC_pdf0 = (isMC ? theBigTree.MC_pdf[0] : 1.);
-	  theSmallTree.m_MC_pdf1 = (isMC ? theBigTree.MC_pdf[1] : 1.);
-	  theSmallTree.m_MC_pdf2 = (isMC ? theBigTree.MC_pdf[2] : 1.);
-	  theSmallTree.m_MC_pdf3 = (isMC ? theBigTree.MC_pdf[3] : 1.);
-	  theSmallTree.m_MC_pdf4 = (isMC ? theBigTree.MC_pdf[4] : 1.);
-	  theSmallTree.m_MC_pdf5 = (isMC ? theBigTree.MC_pdf[5] : 1.);
-	  theSmallTree.m_MC_pdf6 = (isMC ? theBigTree.MC_pdf[6] : 1.);
-	  theSmallTree.m_MC_pdf7 = (isMC ? theBigTree.MC_pdf[7] : 1.);
-	  theSmallTree.m_MC_pdf8 = (isMC ? theBigTree.MC_pdf[8] : 1.);
-	  theSmallTree.m_MC_pdf9 = (isMC ? theBigTree.MC_pdf[9] : 1.);
-	  theSmallTree.m_MC_pdf10 = (isMC ? theBigTree.MC_pdf[10] : 1.);
-	  theSmallTree.m_MC_pdf11 = (isMC ? theBigTree.MC_pdf[11] : 1.);
-	  theSmallTree.m_MC_pdf12 = (isMC ? theBigTree.MC_pdf[12] : 1.);
-	  theSmallTree.m_MC_pdf13 = (isMC ? theBigTree.MC_pdf[13] : 1.);
-	  theSmallTree.m_MC_pdf14 = (isMC ? theBigTree.MC_pdf[14] : 1.);
-	  theSmallTree.m_MC_pdf15 = (isMC ? theBigTree.MC_pdf[15] : 1.);
-	  theSmallTree.m_MC_pdf16 = (isMC ? theBigTree.MC_pdf[16] : 1.);
-	  theSmallTree.m_MC_pdf17 = (isMC ? theBigTree.MC_pdf[17] : 1.);
-	  theSmallTree.m_MC_pdf18 = (isMC ? theBigTree.MC_pdf[18] : 1.);
-	  theSmallTree.m_MC_pdf19 = (isMC ? theBigTree.MC_pdf[19] : 1.);
-	  theSmallTree.m_MC_pdf20 = (isMC ? theBigTree.MC_pdf[20] : 1.);
-	  theSmallTree.m_MC_pdf21 = (isMC ? theBigTree.MC_pdf[21] : 1.);
-	  theSmallTree.m_MC_pdf22 = (isMC ? theBigTree.MC_pdf[22] : 1.);
-	  theSmallTree.m_MC_pdf23 = (isMC ? theBigTree.MC_pdf[23] : 1.);
-	  theSmallTree.m_MC_pdf24 = (isMC ? theBigTree.MC_pdf[24] : 1.);
-	  theSmallTree.m_MC_pdf25 = (isMC ? theBigTree.MC_pdf[25] : 1.);
-	  theSmallTree.m_MC_pdf26 = (isMC ? theBigTree.MC_pdf[26] : 1.);
-	  theSmallTree.m_MC_pdf27 = (isMC ? theBigTree.MC_pdf[27] : 1.);
-	  theSmallTree.m_MC_pdf28 = (isMC ? theBigTree.MC_pdf[28] : 1.);
-	  theSmallTree.m_MC_pdf29 = (isMC ? theBigTree.MC_pdf[29] : 1.);
-	  theSmallTree.m_MC_pdf30 = (isMC ? theBigTree.MC_pdf[30] : 1.);
-	  theSmallTree.m_MC_pdf31 = (isMC ? theBigTree.MC_pdf[31] : 1.);
-	  theSmallTree.m_MC_pdf32 = (isMC ? theBigTree.MC_pdf[32] : 1.);
-	  theSmallTree.m_MC_pdf33 = (isMC ? theBigTree.MC_pdf[33] : 1.);
-	  theSmallTree.m_MC_pdf34 = (isMC ? theBigTree.MC_pdf[34] : 1.);
-	  theSmallTree.m_MC_pdf35 = (isMC ? theBigTree.MC_pdf[35] : 1.);
-	  theSmallTree.m_MC_pdf36 = (isMC ? theBigTree.MC_pdf[36] : 1.);
-	  theSmallTree.m_MC_pdf37 = (isMC ? theBigTree.MC_pdf[37] : 1.);
-	  theSmallTree.m_MC_pdf38 = (isMC ? theBigTree.MC_pdf[38] : 1.);
-	  theSmallTree.m_MC_pdf39 = (isMC ? theBigTree.MC_pdf[39] : 1.);
-	  theSmallTree.m_MC_pdf40 = (isMC ? theBigTree.MC_pdf[40] : 1.);
-	  theSmallTree.m_MC_pdf41 = (isMC ? theBigTree.MC_pdf[41] : 1.);
-	  theSmallTree.m_MC_pdf42 = (isMC ? theBigTree.MC_pdf[42] : 1.);
-	  theSmallTree.m_MC_pdf43 = (isMC ? theBigTree.MC_pdf[43] : 1.);
-	  theSmallTree.m_MC_pdf44 = (isMC ? theBigTree.MC_pdf[44] : 1.);
-	  theSmallTree.m_MC_pdf45 = (isMC ? theBigTree.MC_pdf[45] : 1.);
-	  theSmallTree.m_MC_pdf46 = (isMC ? theBigTree.MC_pdf[46] : 1.);
-	  theSmallTree.m_MC_pdf47 = (isMC ? theBigTree.MC_pdf[47] : 1.);
-	  theSmallTree.m_MC_pdf48 = (isMC ? theBigTree.MC_pdf[48] : 1.);
-	  theSmallTree.m_MC_pdf49 = (isMC ? theBigTree.MC_pdf[49] : 1.);
-	  theSmallTree.m_MC_pdf50 = (isMC ? theBigTree.MC_pdf[50] : 1.);
-	  theSmallTree.m_MC_pdf51 = (isMC ? theBigTree.MC_pdf[51] : 1.);
-	  theSmallTree.m_MC_pdf52 = (isMC ? theBigTree.MC_pdf[52] : 1.);
-	  theSmallTree.m_MC_pdf53 = (isMC ? theBigTree.MC_pdf[53] : 1.);
-	  theSmallTree.m_MC_pdf54 = (isMC ? theBigTree.MC_pdf[54] : 1.);
-	  theSmallTree.m_MC_pdf55 = (isMC ? theBigTree.MC_pdf[55] : 1.);
-	  theSmallTree.m_MC_pdf56 = (isMC ? theBigTree.MC_pdf[56] : 1.);
-	  theSmallTree.m_MC_pdf57 = (isMC ? theBigTree.MC_pdf[57] : 1.);
-	  theSmallTree.m_MC_pdf58 = (isMC ? theBigTree.MC_pdf[58] : 1.);
-	  theSmallTree.m_MC_pdf59 = (isMC ? theBigTree.MC_pdf[59] : 1.);
-	  theSmallTree.m_MC_pdf60 = (isMC ? theBigTree.MC_pdf[60] : 1.);
-	  theSmallTree.m_MC_pdf61 = (isMC ? theBigTree.MC_pdf[61] : 1.);
-	  theSmallTree.m_MC_pdf62 = (isMC ? theBigTree.MC_pdf[62] : 1.);
-	  theSmallTree.m_MC_pdf63 = (isMC ? theBigTree.MC_pdf[63] : 1.);
-	  theSmallTree.m_MC_pdf64 = (isMC ? theBigTree.MC_pdf[64] : 1.);
-	  theSmallTree.m_MC_pdf65 = (isMC ? theBigTree.MC_pdf[65] : 1.);
-	  theSmallTree.m_MC_pdf66 = (isMC ? theBigTree.MC_pdf[66] : 1.);
-	  theSmallTree.m_MC_pdf67 = (isMC ? theBigTree.MC_pdf[67] : 1.);
-	  theSmallTree.m_MC_pdf68 = (isMC ? theBigTree.MC_pdf[68] : 1.);
-	  theSmallTree.m_MC_pdf69 = (isMC ? theBigTree.MC_pdf[69] : 1.);
-	  theSmallTree.m_MC_pdf70 = (isMC ? theBigTree.MC_pdf[70] : 1.);
-	  theSmallTree.m_MC_pdf71 = (isMC ? theBigTree.MC_pdf[71] : 1.);
-	  theSmallTree.m_MC_pdf72 = (isMC ? theBigTree.MC_pdf[72] : 1.);
-	  theSmallTree.m_MC_pdf73 = (isMC ? theBigTree.MC_pdf[73] : 1.);
-	  theSmallTree.m_MC_pdf74 = (isMC ? theBigTree.MC_pdf[74] : 1.);
-	  theSmallTree.m_MC_pdf75 = (isMC ? theBigTree.MC_pdf[75] : 1.);
-	  theSmallTree.m_MC_pdf76 = (isMC ? theBigTree.MC_pdf[76] : 1.);
-	  theSmallTree.m_MC_pdf77 = (isMC ? theBigTree.MC_pdf[77] : 1.);
-	  theSmallTree.m_MC_pdf78 = (isMC ? theBigTree.MC_pdf[78] : 1.);
-	  theSmallTree.m_MC_pdf79 = (isMC ? theBigTree.MC_pdf[79] : 1.);
-	  theSmallTree.m_MC_pdf80 = (isMC ? theBigTree.MC_pdf[80] : 1.);
-	  theSmallTree.m_MC_pdf81 = (isMC ? theBigTree.MC_pdf[81] : 1.);
-	  theSmallTree.m_MC_pdf82 = (isMC ? theBigTree.MC_pdf[82] : 1.);
-	  theSmallTree.m_MC_pdf83 = (isMC ? theBigTree.MC_pdf[83] : 1.);
-	  theSmallTree.m_MC_pdf84 = (isMC ? theBigTree.MC_pdf[84] : 1.);
-	  theSmallTree.m_MC_pdf85 = (isMC ? theBigTree.MC_pdf[85] : 1.);
-	  theSmallTree.m_MC_pdf86 = (isMC ? theBigTree.MC_pdf[86] : 1.);
-	  theSmallTree.m_MC_pdf87 = (isMC ? theBigTree.MC_pdf[87] : 1.);
-	  theSmallTree.m_MC_pdf88 = (isMC ? theBigTree.MC_pdf[88] : 1.);
-	  theSmallTree.m_MC_pdf89 = (isMC ? theBigTree.MC_pdf[89] : 1.);
-	  theSmallTree.m_MC_pdf90 = (isMC ? theBigTree.MC_pdf[90] : 1.);
-	  theSmallTree.m_MC_pdf91 = (isMC ? theBigTree.MC_pdf[91] : 1.);
-	  theSmallTree.m_MC_pdf92 = (isMC ? theBigTree.MC_pdf[92] : 1.);
-	  theSmallTree.m_MC_pdf93 = (isMC ? theBigTree.MC_pdf[93] : 1.);
-	  theSmallTree.m_MC_pdf94 = (isMC ? theBigTree.MC_pdf[94] : 1.);
-	  theSmallTree.m_MC_pdf95 = (isMC ? theBigTree.MC_pdf[95] : 1.);
-	  theSmallTree.m_MC_pdf96 = (isMC ? theBigTree.MC_pdf[96] : 1.);
-	  theSmallTree.m_MC_pdf97 = (isMC ? theBigTree.MC_pdf[97] : 1.);
-	  theSmallTree.m_MC_pdf98 = (isMC ? theBigTree.MC_pdf[98] : 1.);
-	  theSmallTree.m_MC_pdf99 = (isMC ? theBigTree.MC_pdf[99] : 1.);
-	  theSmallTree.m_MC_pdf100 = (isMC ? theBigTree.MC_pdf[100] : 1.);
- 
-	  theSmallTree.m_MC_astrong0 = (isMC ? theBigTree.MC_astrong[0] : 1.);
-	  theSmallTree.m_MC_astrong1 = (isMC ? theBigTree.MC_astrong[1] : 1.);
+	  theSmallTree.m_MC_pdf0 = (isMC ? (theBigTree.MC_pdf[0] != 0 ? theBigTree.MC_pdf[0] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf1 = (isMC ? (theBigTree.MC_pdf[1] != 0 ? theBigTree.MC_pdf[1] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf2 = (isMC ? (theBigTree.MC_pdf[2] != 0 ? theBigTree.MC_pdf[2] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf3 = (isMC ? (theBigTree.MC_pdf[3] != 0 ? theBigTree.MC_pdf[3] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf4 = (isMC ? (theBigTree.MC_pdf[4] != 0 ? theBigTree.MC_pdf[4] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf5 = (isMC ? (theBigTree.MC_pdf[5] != 0 ? theBigTree.MC_pdf[5] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf6 = (isMC ? (theBigTree.MC_pdf[6] != 0 ? theBigTree.MC_pdf[6] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf7 = (isMC ? (theBigTree.MC_pdf[7] != 0 ? theBigTree.MC_pdf[7] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf8 = (isMC ? (theBigTree.MC_pdf[8] != 0 ? theBigTree.MC_pdf[8] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf9 = (isMC ? (theBigTree.MC_pdf[9] != 0 ? theBigTree.MC_pdf[9] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf10 = (isMC ? (theBigTree.MC_pdf[10] != 0 ? theBigTree.MC_pdf[10] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf11 = (isMC ? (theBigTree.MC_pdf[11] != 0 ? theBigTree.MC_pdf[11] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf12 = (isMC ? (theBigTree.MC_pdf[12] != 0 ? theBigTree.MC_pdf[12] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf13 = (isMC ? (theBigTree.MC_pdf[13] != 0 ? theBigTree.MC_pdf[13] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf14 = (isMC ? (theBigTree.MC_pdf[14] != 0 ? theBigTree.MC_pdf[14] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf15 = (isMC ? (theBigTree.MC_pdf[15] != 0 ? theBigTree.MC_pdf[15] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf16 = (isMC ? (theBigTree.MC_pdf[16] != 0 ? theBigTree.MC_pdf[16] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf17 = (isMC ? (theBigTree.MC_pdf[17] != 0 ? theBigTree.MC_pdf[17] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf18 = (isMC ? (theBigTree.MC_pdf[18] != 0 ? theBigTree.MC_pdf[18] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf19 = (isMC ? (theBigTree.MC_pdf[19] != 0 ? theBigTree.MC_pdf[19] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf20 = (isMC ? (theBigTree.MC_pdf[20] != 0 ? theBigTree.MC_pdf[20] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf21 = (isMC ? (theBigTree.MC_pdf[21] != 0 ? theBigTree.MC_pdf[21] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf22 = (isMC ? (theBigTree.MC_pdf[22] != 0 ? theBigTree.MC_pdf[22] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf23 = (isMC ? (theBigTree.MC_pdf[23] != 0 ? theBigTree.MC_pdf[23] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf24 = (isMC ? (theBigTree.MC_pdf[24] != 0 ? theBigTree.MC_pdf[24] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf25 = (isMC ? (theBigTree.MC_pdf[25] != 0 ? theBigTree.MC_pdf[25] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf26 = (isMC ? (theBigTree.MC_pdf[26] != 0 ? theBigTree.MC_pdf[26] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf27 = (isMC ? (theBigTree.MC_pdf[27] != 0 ? theBigTree.MC_pdf[27] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf28 = (isMC ? (theBigTree.MC_pdf[28] != 0 ? theBigTree.MC_pdf[28] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf29 = (isMC ? (theBigTree.MC_pdf[29] != 0 ? theBigTree.MC_pdf[29] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf30 = (isMC ? (theBigTree.MC_pdf[30] != 0 ? theBigTree.MC_pdf[30] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf31 = (isMC ? (theBigTree.MC_pdf[31] != 0 ? theBigTree.MC_pdf[31] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf32 = (isMC ? (theBigTree.MC_pdf[32] != 0 ? theBigTree.MC_pdf[32] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf33 = (isMC ? (theBigTree.MC_pdf[33] != 0 ? theBigTree.MC_pdf[33] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf34 = (isMC ? (theBigTree.MC_pdf[34] != 0 ? theBigTree.MC_pdf[34] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf35 = (isMC ? (theBigTree.MC_pdf[35] != 0 ? theBigTree.MC_pdf[35] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf36 = (isMC ? (theBigTree.MC_pdf[36] != 0 ? theBigTree.MC_pdf[36] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf37 = (isMC ? (theBigTree.MC_pdf[37] != 0 ? theBigTree.MC_pdf[37] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf38 = (isMC ? (theBigTree.MC_pdf[38] != 0 ? theBigTree.MC_pdf[38] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf39 = (isMC ? (theBigTree.MC_pdf[39] != 0 ? theBigTree.MC_pdf[39] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf40 = (isMC ? (theBigTree.MC_pdf[40] != 0 ? theBigTree.MC_pdf[40] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf41 = (isMC ? (theBigTree.MC_pdf[41] != 0 ? theBigTree.MC_pdf[41] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf42 = (isMC ? (theBigTree.MC_pdf[42] != 0 ? theBigTree.MC_pdf[42] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf43 = (isMC ? (theBigTree.MC_pdf[43] != 0 ? theBigTree.MC_pdf[43] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf44 = (isMC ? (theBigTree.MC_pdf[44] != 0 ? theBigTree.MC_pdf[44] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf45 = (isMC ? (theBigTree.MC_pdf[45] != 0 ? theBigTree.MC_pdf[45] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf46 = (isMC ? (theBigTree.MC_pdf[46] != 0 ? theBigTree.MC_pdf[46] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf47 = (isMC ? (theBigTree.MC_pdf[47] != 0 ? theBigTree.MC_pdf[47] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf48 = (isMC ? (theBigTree.MC_pdf[48] != 0 ? theBigTree.MC_pdf[48] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf49 = (isMC ? (theBigTree.MC_pdf[49] != 0 ? theBigTree.MC_pdf[49] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf50 = (isMC ? (theBigTree.MC_pdf[50] != 0 ? theBigTree.MC_pdf[50] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf51 = (isMC ? (theBigTree.MC_pdf[51] != 0 ? theBigTree.MC_pdf[51] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf52 = (isMC ? (theBigTree.MC_pdf[52] != 0 ? theBigTree.MC_pdf[52] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf53 = (isMC ? (theBigTree.MC_pdf[53] != 0 ? theBigTree.MC_pdf[53] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf54 = (isMC ? (theBigTree.MC_pdf[54] != 0 ? theBigTree.MC_pdf[54] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf55 = (isMC ? (theBigTree.MC_pdf[55] != 0 ? theBigTree.MC_pdf[55] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf56 = (isMC ? (theBigTree.MC_pdf[56] != 0 ? theBigTree.MC_pdf[56] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf57 = (isMC ? (theBigTree.MC_pdf[57] != 0 ? theBigTree.MC_pdf[57] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf58 = (isMC ? (theBigTree.MC_pdf[58] != 0 ? theBigTree.MC_pdf[58] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf59 = (isMC ? (theBigTree.MC_pdf[59] != 0 ? theBigTree.MC_pdf[59] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf60 = (isMC ? (theBigTree.MC_pdf[60] != 0 ? theBigTree.MC_pdf[60] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf61 = (isMC ? (theBigTree.MC_pdf[61] != 0 ? theBigTree.MC_pdf[61] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf62 = (isMC ? (theBigTree.MC_pdf[62] != 0 ? theBigTree.MC_pdf[62] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf63 = (isMC ? (theBigTree.MC_pdf[63] != 0 ? theBigTree.MC_pdf[63] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf64 = (isMC ? (theBigTree.MC_pdf[64] != 0 ? theBigTree.MC_pdf[64] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf65 = (isMC ? (theBigTree.MC_pdf[65] != 0 ? theBigTree.MC_pdf[65] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf66 = (isMC ? (theBigTree.MC_pdf[66] != 0 ? theBigTree.MC_pdf[66] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf67 = (isMC ? (theBigTree.MC_pdf[67] != 0 ? theBigTree.MC_pdf[67] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf68 = (isMC ? (theBigTree.MC_pdf[68] != 0 ? theBigTree.MC_pdf[68] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf69 = (isMC ? (theBigTree.MC_pdf[69] != 0 ? theBigTree.MC_pdf[69] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf70 = (isMC ? (theBigTree.MC_pdf[70] != 0 ? theBigTree.MC_pdf[70] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf71 = (isMC ? (theBigTree.MC_pdf[71] != 0 ? theBigTree.MC_pdf[71] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf72 = (isMC ? (theBigTree.MC_pdf[72] != 0 ? theBigTree.MC_pdf[72] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf73 = (isMC ? (theBigTree.MC_pdf[73] != 0 ? theBigTree.MC_pdf[73] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf74 = (isMC ? (theBigTree.MC_pdf[74] != 0 ? theBigTree.MC_pdf[74] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf75 = (isMC ? (theBigTree.MC_pdf[75] != 0 ? theBigTree.MC_pdf[75] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf76 = (isMC ? (theBigTree.MC_pdf[76] != 0 ? theBigTree.MC_pdf[76] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf77 = (isMC ? (theBigTree.MC_pdf[77] != 0 ? theBigTree.MC_pdf[77] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf78 = (isMC ? (theBigTree.MC_pdf[78] != 0 ? theBigTree.MC_pdf[78] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf79 = (isMC ? (theBigTree.MC_pdf[79] != 0 ? theBigTree.MC_pdf[79] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf80 = (isMC ? (theBigTree.MC_pdf[80] != 0 ? theBigTree.MC_pdf[80] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf81 = (isMC ? (theBigTree.MC_pdf[81] != 0 ? theBigTree.MC_pdf[81] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf82 = (isMC ? (theBigTree.MC_pdf[82] != 0 ? theBigTree.MC_pdf[82] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf83 = (isMC ? (theBigTree.MC_pdf[83] != 0 ? theBigTree.MC_pdf[83] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf84 = (isMC ? (theBigTree.MC_pdf[84] != 0 ? theBigTree.MC_pdf[84] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf85 = (isMC ? (theBigTree.MC_pdf[85] != 0 ? theBigTree.MC_pdf[85] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf86 = (isMC ? (theBigTree.MC_pdf[86] != 0 ? theBigTree.MC_pdf[86] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf87 = (isMC ? (theBigTree.MC_pdf[87] != 0 ? theBigTree.MC_pdf[87] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf88 = (isMC ? (theBigTree.MC_pdf[88] != 0 ? theBigTree.MC_pdf[88] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf89 = (isMC ? (theBigTree.MC_pdf[89] != 0 ? theBigTree.MC_pdf[89] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf90 = (isMC ? (theBigTree.MC_pdf[90] != 0 ? theBigTree.MC_pdf[90] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf91 = (isMC ? (theBigTree.MC_pdf[91] != 0 ? theBigTree.MC_pdf[91] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf92 = (isMC ? (theBigTree.MC_pdf[92] != 0 ? theBigTree.MC_pdf[92] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf93 = (isMC ? (theBigTree.MC_pdf[93] != 0 ? theBigTree.MC_pdf[93] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf94 = (isMC ? (theBigTree.MC_pdf[94] != 0 ? theBigTree.MC_pdf[94] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf95 = (isMC ? (theBigTree.MC_pdf[95] != 0 ? theBigTree.MC_pdf[95] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf96 = (isMC ? (theBigTree.MC_pdf[96] != 0 ? theBigTree.MC_pdf[96] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf97 = (isMC ? (theBigTree.MC_pdf[97] != 0 ? theBigTree.MC_pdf[97] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf98 = (isMC ? (theBigTree.MC_pdf[98] != 0 ? theBigTree.MC_pdf[98] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf99 = (isMC ? (theBigTree.MC_pdf[99] != 0 ? theBigTree.MC_pdf[99] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_pdf100 = (isMC ? (theBigTree.MC_pdf[100] != 0 ? theBigTree.MC_pdf[100] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+
+	  theSmallTree.m_MC_astrong0 = (isMC ? (theBigTree.MC_astrong[0] != 0 ? theBigTree.MC_astrong[0] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
+	  theSmallTree.m_MC_astrong1 = (isMC ? (theBigTree.MC_astrong[1] != 0 ? theBigTree.MC_astrong[1] * MC_weight_fixed : theSmallTree.m_MC_weight) : 1.);
 
 	  theSmallTree.m_lheht       = (isMC ? theBigTree.lheHt : 0) ;
 	  theSmallTree.m_EventNumber = theBigTree.EventNumber ;
@@ -2707,8 +2719,10 @@ int main (int argc, char** argv)
 
 	  float leg1pt  = tlv_firstLepton.Pt();
 	  float leg1eta = TMath::Abs(tlv_firstLepton.Eta());
+	  float leg1eta_SC = theBigTree.daughters_SCeta->at(firstDaughterIndex); // needed for electron SFs and eta gap veto
 	  float leg2pt  = tlv_secondLepton.Pt();
 	  float leg2eta = TMath::Abs(tlv_secondLepton.Eta());
+	  float leg2eta_SC = theBigTree.daughters_SCeta->at(secondDaughterIndex); // needed for electron SFs and eta gap veto
 
 	  // the first tau only makes sense in the TauTau channel
 	  int tau1DM  = static_cast<int>(theSmallTree.m_dau1_decayMode);
@@ -2786,21 +2800,20 @@ int main (int argc, char** argv)
 			}
 
 			else if (pType == 1) {
-				//TODO: should be super cluster eta (not available in bigntuples at the moment)
 				float leg1_eleReco_SF;
 				float leg1_eleReco_SFerr;
 				// ele RECO SFs are split into two categories: pt <= 20 and pt > 20
 				if(leg1pt <= 20){
-					leg1_eleReco_SF = lepSFs[2]->get_direct_ScaleFactor(leg1pt, leg1eta, pType);
-					leg1_eleReco_SFerr = lepSFs[2]->get_direct_ScaleFactorError(leg1pt, leg1eta, pType);
+					leg1_eleReco_SF = lepSFs[2]->get_direct_ScaleFactor(leg1pt, leg1eta_SC, pType);
+					leg1_eleReco_SFerr = lepSFs[2]->get_direct_ScaleFactorError(leg1pt, leg1eta_SC, pType);
 				}
 				else{
-					leg1_eleReco_SF = lepSFs[3]->get_direct_ScaleFactor(leg1pt, leg1eta, pType);
-					leg1_eleReco_SFerr = lepSFs[3]->get_direct_ScaleFactorError(leg1pt, leg1eta, pType);
+					leg1_eleReco_SF = lepSFs[3]->get_direct_ScaleFactor(leg1pt, leg1eta_SC, pType);
+					leg1_eleReco_SFerr = lepSFs[3]->get_direct_ScaleFactorError(leg1pt, leg1eta_SC, pType);
 				}
 
-				float leg1_eleID_SF = lepSFs[4]->get_direct_ScaleFactor(leg1pt, leg1eta, pType);
-				float leg1_eleID_SFerr = lepSFs[4]->get_direct_ScaleFactorError(leg1pt, leg1eta, pType);
+				float leg1_eleID_SF = lepSFs[4]->get_direct_ScaleFactor(leg1pt, leg1eta_SC, pType);
+				float leg1_eleID_SFerr = lepSFs[4]->get_direct_ScaleFactorError(leg1pt, leg1eta_SC, pType);
 
 				idSF_leg1 = leg1_eleID_SF * leg1_eleReco_SF;
 				idSF_leg1_eleID_up = (leg1_eleID_SF + leg1_eleID_SFerr) * leg1_eleReco_SF;
@@ -2851,21 +2864,20 @@ int main (int argc, char** argv)
 			idSF_leg2_deep_vsJet_2d = idSF_leg2;
 		}
 		else if(pType == 4) { //EleEle
-			//TODO: should be super cluster eta (not available in bigntuples at the moment)
 			float leg1_eleReco_SF;
 			float leg1_eleReco_SFerr;
 			// ele RECO SFs are split into two categories: pt <= 20 and pt > 20
 			if(leg1pt <= 20){
-				leg1_eleReco_SF = lepSFs[2]->get_direct_ScaleFactor(leg1pt, leg1eta, pType);
-				leg1_eleReco_SFerr = lepSFs[2]->get_direct_ScaleFactorError(leg1pt, leg1eta, pType);
+				leg1_eleReco_SF = lepSFs[2]->get_direct_ScaleFactor(leg1pt, leg1eta_SC, pType);
+				leg1_eleReco_SFerr = lepSFs[2]->get_direct_ScaleFactorError(leg1pt, leg1eta_SC, pType);
 			}
 			else{
-				leg1_eleReco_SF = lepSFs[3]->get_direct_ScaleFactor(leg1pt, leg1eta, pType);
-				leg1_eleReco_SFerr = lepSFs[3]->get_direct_ScaleFactorError(leg1pt, leg1eta, pType);
+				leg1_eleReco_SF = lepSFs[3]->get_direct_ScaleFactor(leg1pt, leg1eta_SC, pType);
+				leg1_eleReco_SFerr = lepSFs[3]->get_direct_ScaleFactorError(leg1pt, leg1eta_SC, pType);
 			}
 
-			float leg1_eleID_SF = lepSFs[4]->get_direct_ScaleFactor(leg1pt, leg1eta, pType);
-			float leg1_eleID_SFerr = lepSFs[4]->get_direct_ScaleFactorError(leg1pt, leg1eta, pType);
+			float leg1_eleID_SF = lepSFs[4]->get_direct_ScaleFactor(leg1pt, leg1eta_SC, pType);
+			float leg1_eleID_SFerr = lepSFs[4]->get_direct_ScaleFactorError(leg1pt, leg1eta_SC, pType);
 
 			idSF_leg1 = leg1_eleID_SF;
 			idSF_leg1_eleID_up = leg1_eleReco_SF * (leg1_eleID_SF + leg1_eleID_SFerr);
@@ -2874,22 +2886,21 @@ int main (int argc, char** argv)
 			idSF_leg1_eleReco_up = (leg1_eleReco_SF + leg1_eleReco_SFerr) * leg1_eleID_SF;
 			idSF_leg1_eleReco_down = (leg1_eleReco_SF - leg1_eleReco_SFerr) * leg1_eleID_SF;
 
-			//TODO: should be super cluster eta (not available in bigntuples at the moment)
 			float leg2_eleReco_SF;
 			float leg2_eleReco_SFerr;
 			// ele RECO SFs are split into two categories: pt <= 20 and pt > 20
 			if(leg2pt <= 20){
-				leg2_eleReco_SF = lepSFs[2]->get_direct_ScaleFactor(leg2pt, leg2eta, pType);
-				leg2_eleReco_SFerr = lepSFs[2]->get_direct_ScaleFactorError(leg2pt, leg2eta, pType);
+				leg2_eleReco_SF = lepSFs[2]->get_direct_ScaleFactor(leg2pt, leg2eta_SC, pType);
+				leg2_eleReco_SFerr = lepSFs[2]->get_direct_ScaleFactorError(leg2pt, leg2eta_SC, pType);
 			}
 			else{
-				leg2_eleReco_SF = lepSFs[3]->get_direct_ScaleFactor(leg2pt, leg2eta, pType);
-				leg2_eleReco_SFerr = lepSFs[3]->get_direct_ScaleFactorError(leg2pt, leg2eta, pType);
+				leg2_eleReco_SF = lepSFs[3]->get_direct_ScaleFactor(leg2pt, leg2eta_SC, pType);
+				leg2_eleReco_SFerr = lepSFs[3]->get_direct_ScaleFactorError(leg2pt, leg2eta_SC, pType);
 			}
 
 
-			float leg2_eleID_SF = lepSFs[4]->get_direct_ScaleFactor(leg2pt, leg2eta, pType);
-			float leg2_eleID_SFerr = lepSFs[4]->get_direct_ScaleFactorError(leg2pt, leg2eta, pType);
+			float leg2_eleID_SF = lepSFs[4]->get_direct_ScaleFactor(leg2pt, leg2eta_SC, pType);
+			float leg2_eleID_SFerr = lepSFs[4]->get_direct_ScaleFactorError(leg2pt, leg2eta_SC, pType);
 
 			idSF_leg2 = leg2_eleID_SF;
 
@@ -3844,20 +3855,20 @@ int main (int argc, char** argv)
 				  //lepton trigger
 				  double Eff_SL_ele_Data = 1., Eff_SL_ele_MC = 1., Eff_SL_ele_Data_Err = 0., Eff_SL_ele_MC_Err = 0.;
 				  if (passSingle) {
-					Eff_SL_ele_Data = eTrgSF->get_EfficiencyData(tlv_firstLepton.Pt(), tlv_firstLepton.Eta(), pType);
-					Eff_SL_ele_MC   = eTrgSF->get_EfficiencyMC(  tlv_firstLepton.Pt(), tlv_firstLepton.Eta(), pType);
-					Eff_SL_ele_Data_Err = eTrgSF->get_EfficiencyDataError(tlv_firstLepton.Pt(), tlv_firstLepton.Eta(), pType);
-					Eff_SL_ele_MC_Err   = eTrgSF->get_EfficiencyMCError(  tlv_firstLepton.Pt(), tlv_firstLepton.Eta(), pType);
+					Eff_SL_ele_Data = eTrgSF->get_EfficiencyData(tlv_firstLepton.Pt(), leg1eta_SC, pType);
+					Eff_SL_ele_MC = eTrgSF->get_EfficiencyMC(  tlv_firstLepton.Pt(), leg1eta_SC, pType);
+					Eff_SL_ele_Data_Err = eTrgSF->get_EfficiencyDataError(tlv_firstLepton.Pt(), leg1eta_SC, pType);
+					Eff_SL_ele_MC_Err = eTrgSF->get_EfficiencyMCError(  tlv_firstLepton.Pt(), leg1eta_SC, pType);
 				  }
 
 				  //cross-trigger
 				  //e leg
 				  double Eff_cross_ele_Data = 1., Eff_cross_ele_MC = 1., Eff_cross_ele_Data_Err = 0., Eff_cross_ele_MC_Err = 0.;
 				  if (passCross) {
-					Eff_cross_ele_Data = eTauTrgSF->get_EfficiencyData(tlv_firstLepton.Pt(), tlv_firstLepton.Eta(), pType);
-					Eff_cross_ele_MC	 = eTauTrgSF->get_EfficiencyMC(tlv_firstLepton.Pt(),   tlv_firstLepton.Eta(), pType);
-					Eff_cross_ele_Data_Err = eTauTrgSF->get_EfficiencyDataError(tlv_firstLepton.Pt(), tlv_firstLepton.Eta(), pType);
-					Eff_cross_ele_MC_Err	 = eTauTrgSF->get_EfficiencyMCError(tlv_firstLepton.Pt(),	tlv_firstLepton.Eta(), pType);
+					Eff_cross_ele_Data = eTauTrgSF->get_EfficiencyData(tlv_firstLepton.Pt(), leg1eta_SC, pType);
+					Eff_cross_ele_MC = eTauTrgSF->get_EfficiencyMC(tlv_firstLepton.Pt(), leg1eta_SC, pType);
+					Eff_cross_ele_Data_Err = eTauTrgSF->get_EfficiencyDataError(tlv_firstLepton.Pt(), leg1eta_SC, pType);
+					Eff_cross_ele_MC_Err = eTauTrgSF->get_EfficiencyMCError(tlv_firstLepton.Pt(), leg1eta_SC, pType);
 				  }
 
 				  //tau leg
@@ -3960,13 +3971,13 @@ int main (int argc, char** argv)
 				  else {
 					// dirty trick to deal with bad efficiency values in a (very) low-stat bins
 					// should only affect one bin in sf_el_2016post_HLTEle25.root
-					if(PERIOD == "2016postVFP" and tlv_firstLepton.Pt() >= 100. and tlv_firstLepton.Eta() <= -2.) {
-					  SF     = eTrgSF->get_ScaleFactor(     tlv_firstLepton.Pt(), -tlv_firstLepton.Eta(), pType);
-					  SF_Err = eTrgSF->get_ScaleFactorError(tlv_firstLepton.Pt(), -tlv_firstLepton.Eta(), pType);
+					if(PERIOD == "2016postVFP" and tlv_firstLepton.Pt() >= 100. and leg1eta_SC <= -2.) {
+					  SF = eTrgSF->get_ScaleFactor(tlv_firstLepton.Pt(), -leg1eta_SC, pType);
+					  SF_Err = eTrgSF->get_ScaleFactorError(tlv_firstLepton.Pt(), -leg1eta_SC, pType);
 					}
 					else {
-					  SF     = eTrgSF->get_ScaleFactor(     tlv_firstLepton.Pt(), tlv_firstLepton.Eta(), pType);
-					  SF_Err = eTrgSF->get_ScaleFactorError(tlv_firstLepton.Pt(), tlv_firstLepton.Eta(), pType);
+					  SF = eTrgSF->get_ScaleFactor(tlv_firstLepton.Pt(), leg1eta_SC, pType);
+					  SF_Err = eTrgSF->get_ScaleFactorError(tlv_firstLepton.Pt(), leg1eta_SC, pType);
 					}
 				  }
 
@@ -4223,8 +4234,8 @@ int main (int argc, char** argv)
 				  trigSF_tau_DM11_down  = trigSF;
 				}
 			  else if (trgRegions["legacy"]) {
-				double SF     = eTrgSF->get_ScaleFactor(     tlv_firstLepton.Pt(), tlv_firstLepton.Eta(), pType);
-				double SF_Err = eTrgSF->get_ScaleFactorError(tlv_firstLepton.Pt(), tlv_firstLepton.Eta(), pType);
+				double SF = eTrgSF->get_ScaleFactor(tlv_firstLepton.Pt(), leg1eta_SC, pType);
+				double SF_Err = eTrgSF->get_ScaleFactorError(tlv_firstLepton.Pt(), leg1eta_SC, pType);
 				trigSF = SF;
 				trigSFnoMET           = trigSF;
 				trigSFnoTau           = trigSF;
@@ -5377,8 +5388,9 @@ int main (int argc, char** argv)
 			tlv_fj *= smears_AK8[ifj];
 		  }
 		  
-		  if (tlv_fj.Pt() < 250 or theBigTree.ak8jets_SoftDropMass->at(ifj) < 30 or
-			  tlv_fj.DeltaR(tlv_firstLepton) < 0.8 or tlv_fj.DeltaR(tlv_secondLepton) < 0.8) {
+		  if(tlv_fj.Pt() < 250 or theBigTree.ak8jets_SoftDropMass->at(ifj) < 30 or
+			tlv_fj.DeltaR(tlv_firstLepton) < 0.8 or tlv_fj.DeltaR(tlv_secondLepton) < 0.8 or
+			theBigTree.PFjetID_AK8Puppi->at(ifj) < PFjetID_WP) { // 0: don't pass PF Jet ID; 1: tight, 2: tightLepVeto
 			continue;
 		  }
 			    
@@ -5767,14 +5779,18 @@ int main (int argc, char** argv)
 
   if (totalEvents != 0) cout << "efficiency = " << selectedEvents / totalEvents << endl ;
   else                  cout << "NO events found\n" ;
-  TH1F h_eff ("h_eff", "h_eff", 6 , 0, 6) ;
-  h_eff.SetBinContent (1, totalEvents) ;
-  h_eff.SetBinContent (2, selectedEvents) ;
-  h_eff.SetBinContent (3, totalNoWeightsEventsNum) ;
-  h_eff.SetBinContent (4, selectedNoWeightsEventsNum) ;
-  h_eff.SetBinContent (5, totalEvents_PUReweight_up) ;
-  h_eff.SetBinContent (6, totalEvents_PUReweight_down) ;
-  
+  int h_eff_nbins = 6 + totalEvents_QCDscale.size() + totalEvents_pdf.size() + totalEvents_alphaS.size();
+  TH1F h_eff ("h_eff", "h_eff", h_eff_nbins, 0, h_eff_nbins) ;
+  h_eff.SetBinContent (1, totalEvents);
+  h_eff.SetBinContent (2, selectedEvents);
+  h_eff.SetBinContent (3, totalNoWeightsEventsNum);
+  h_eff.SetBinContent (4, selectedNoWeightsEventsNum);
+  h_eff.SetBinContent (5, totalEvents_PUReweight_up);
+  h_eff.SetBinContent (6, totalEvents_PUReweight_down);
+  for(uint i = 0; i < totalEvents_QCDscale.size(); i++) h_eff.SetBinContent(7+i, totalEvents_QCDscale[i]);
+  for(uint i = 0; i < totalEvents_pdf.size(); i++) h_eff.SetBinContent(7+totalEvents_QCDscale.size()+i, totalEvents_pdf[i]);
+  for(uint i = 0; i < totalEvents_alphaS.size(); i++) h_eff.SetBinContent(7+totalEvents_QCDscale.size()+totalEvents_pdf.size()+i, totalEvents_alphaS[i]);
+
   // store more detailed eff counter in output
   vector<pair<string, double> > vEffSumm = ec.GetSummary();
   TH1F* h_effSummary = new TH1F ("h_effSummary", "h_effSummary", vEffSumm.size(), 0, vEffSumm.size());
