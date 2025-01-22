@@ -772,14 +772,14 @@ struct smallTree
       m_HHbregrsvfit_phi = -1.;
       m_HHbregrsvfit_m   = -1.;
       m_fatjet_particleNetMDJetTags_HP_SF = 1.;
-      m_fatjet_particleNetMDJetTags_HP_SF_up = 0.;
-      m_fatjet_particleNetMDJetTags_HP_SF_down = 0.;
+      m_fatjet_particleNetMDJetTags_HP_SF_up = 1.;
+      m_fatjet_particleNetMDJetTags_HP_SF_down = 1.;
       m_fatjet_particleNetMDJetTags_MP_SF = 1.;
-      m_fatjet_particleNetMDJetTags_MP_SF_up = 0.;
-      m_fatjet_particleNetMDJetTags_MP_SF_down = 0.;
+      m_fatjet_particleNetMDJetTags_MP_SF_up = 1.;
+      m_fatjet_particleNetMDJetTags_MP_SF_down = 1.;
       m_fatjet_particleNetMDJetTags_LP_SF = 1.;
-      m_fatjet_particleNetMDJetTags_LP_SF_up = 0.;
-      m_fatjet_particleNetMDJetTags_LP_SF_down = 0.;
+      m_fatjet_particleNetMDJetTags_LP_SF_up = 1.;
+      m_fatjet_particleNetMDJetTags_LP_SF_down = 1.;
 
       m_subjetjet1_pt = -1. ;
       m_subjetjet1_eta  = -1. ;
