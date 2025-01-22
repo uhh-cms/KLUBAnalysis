@@ -1225,37 +1225,32 @@ int main (int argc, char** argv)
 
 	  // storing H or Z decaying into bb in dedicated vectors
 	  std::vector<TLorentzVector> higgsVectors;
-	  std::vector<TLorentzVector> bQuarksFromHiggs;
-	  
 	  std::vector<TLorentzVector> zBosonVectors;  
-	  std::vector<TLorentzVector> bQuarksFromZ;
 
-	  
-	  for (unsigned int igen = 0; igen < theBigTree.genpart_px->size(); igen++) {
-	    int pdg = theBigTree.genpart_pdg->at(igen);
-	    bool isQuarkb = (pdg == 5);
-	    TLorentzVector vBoson, vB1;
-	    int idx_H = -1.;
-	    int idx_Z = -1.;
-
-	    if(isQuarkb){ //focusing only on b (not anti-b), assuming that a b from a Z or a Higgs is paired with an anti-b
-	      idx_H = theBigTree.genpart_HMothInd->at(igen);
-	      idx_Z = theBigTree.genpart_ZMothInd->at(igen);
-	      if (idx_H != -1.) { // b from H
-		vBoson.SetPxPyPzE(theBigTree.genpart_px->at(idx_H), theBigTree.genpart_py->at(idx_H), theBigTree.genpart_pz->at(idx_H), theBigTree.genpart_e->at(idx_H));
-		vB1.SetPxPyPzE(theBigTree.genpart_px->at(igen), theBigTree.genpart_py->at(igen), theBigTree.genpart_pz->at(igen), theBigTree.genpart_e->at(igen));
-		higgsVectors.push_back(vBoson);  
-		bQuarksFromHiggs.push_back(vB1);
-	      } 
-	      else if (idx_Z != - 1.) { // b from Z
-		vBoson.SetPxPyPzE(theBigTree.genpart_px->at(idx_Z), theBigTree.genpart_py->at(idx_Z), theBigTree.genpart_pz->at(idx_Z), theBigTree.genpart_e->at(idx_Z));
-		vB1.SetPxPyPzE(theBigTree.genpart_px->at(igen), theBigTree.genpart_py->at(igen), theBigTree.genpart_pz->at(igen), theBigTree.genpart_e->at(igen));
-		zBosonVectors.push_back(vBoson);  
-		bQuarksFromZ.push_back(vB1);	       
-	      }
-	    } // if isQuarkb
-	  } // loop on gen particles
-	  
+	  if (isMC){
+	    for (unsigned int igen = 0; igen < theBigTree.genpart_px->size(); igen++) {
+	      int pdg = theBigTree.genpart_pdg->at(igen);
+	      bool isQuarkb = (pdg == 5);
+	      TLorentzVector vBoson, vB1;
+	      int idx_H = -1.;
+	      int idx_Z = -1.;
+	      
+	      if(isQuarkb){ //focusing only on b (not anti-b), assuming that a b from a Z or a Higgs is paired with an anti-b
+		idx_H = theBigTree.genpart_HMothInd->at(igen);
+		idx_Z = theBigTree.genpart_ZMothInd->at(igen);
+		if (idx_H != -1.) { // b from H
+		  vBoson.SetPxPyPzE(theBigTree.genpart_px->at(idx_H), theBigTree.genpart_py->at(idx_H), theBigTree.genpart_pz->at(idx_H), theBigTree.genpart_e->at(idx_H));
+		  vB1.SetPxPyPzE(theBigTree.genpart_px->at(igen), theBigTree.genpart_py->at(igen), theBigTree.genpart_pz->at(igen), theBigTree.genpart_e->at(igen));
+		  higgsVectors.push_back(vBoson);  
+		} 
+		else if (idx_Z != - 1.) { // b from Z
+		  vBoson.SetPxPyPzE(theBigTree.genpart_px->at(idx_Z), theBigTree.genpart_py->at(idx_Z), theBigTree.genpart_pz->at(idx_Z), theBigTree.genpart_e->at(idx_Z));
+		  vB1.SetPxPyPzE(theBigTree.genpart_px->at(igen), theBigTree.genpart_py->at(igen), theBigTree.genpart_pz->at(igen), theBigTree.genpart_e->at(igen));
+		  zBosonVectors.push_back(vBoson);  
+		}
+	      } // if isQuarkb
+	    } // loop on gen particles
+	  } // end of isMC
 
 	  ///////////////////////////////////////////////////////////
 	  // END of gen related stuff -- compute tot number of events
@@ -5450,52 +5445,53 @@ int main (int argc, char** argv)
 		  theSmallTree.m_HHbregrsvfit_phi = tlv_HHbregrsvfit.Phi();
 		  theSmallTree.m_HHbregrsvfit_m	  = tlv_HHbregrsvfit.M();
 
-		  // verify if the fatjet matches any previously found Higgs or Z decaying into bb
-		  bool matchedToHiggs = false;
-		  bool matchedToZ = false;
-		  for (const auto& higgs : higgsVectors) {
-		    if (tlv_fj.DeltaR(higgs) < 0.8) {
-		      matchedToHiggs = true;
-		      break;
+		  if(isMC){
+		    // verify if the fatjet matches any previously found Higgs or Z decaying into bb
+		    bool matchedToHiggs = false;
+		    bool matchedToZ = false;
+		    for (const auto& higgs : higgsVectors) {
+		      if (tlv_fj.DeltaR(higgs) < 0.8) {
+			matchedToHiggs = true;
+			break;
+		      }
 		    }
-		  }
-		  for (const auto& zboson : zBosonVectors) {
-		    if (tlv_fj.DeltaR(zboson) < 0.8) {
-		      matchedToZ = true;
-		      break;
+		    for (const auto& zboson : zBosonVectors) {
+		      if (tlv_fj.DeltaR(zboson) < 0.8) {
+			matchedToZ = true;
+			break;
+		      }
 		    }
-		  }
-
-		  // determine sample type
-		  // for each sample, it is first checked whether there is an event where POG SF can be applied, meaning an H or Z decaying into two b-quarks. 
-		  //   if this is not the case, the sample is assigned a hypothesis about the most likely topology
-		  std::string sample_type = "";
-		  if (matchedToHiggs || matchedToZ){
-		    sample_type = "HHlike";
-		  }
-		  else if  (isDYlike==1){
-		    sample_type = "DYlike";
-		  }
-		  else if (isTTlike==1){
-		    sample_type = "TTlike";
-		  }
+		    
+		    // determine sample type
+		    // for each sample, it is first checked whether there is an event where POG SF can be applied, meaning an H or Z decaying into two b-quarks. 
+		    //   if this is not the case, the sample is assigned a hypothesis about the most likely topology
+		    std::string sample_type = "";
+		    if (matchedToHiggs || matchedToZ){
+		      sample_type = "HHlike";
+		    }
+		    else if  (isDYlike==1){
+		      sample_type = "DYlike";
+		    }
+		    else if (isTTlike==1){
+		      sample_type = "TTlike";
+		    }
 		  
-		  // Getting ParticleNet scale factors from the class
-		  if (sample_type != ""){
-		    auto PNetAK8SF = PNetSFInterface(PERIOD);
-		    std::vector<float> PNetSFmap = PNetAK8SF.getSFvec(tlv_fj.Pt(), sample_type);
-		    // other WPs commented to save memory
-		    // theSmallTree.m_fatjet_particleNetMDJetTags_HP_SF      = PNetSFmap[0];
-		    // theSmallTree.m_fatjet_particleNetMDJetTags_HP_SF_up   = PNetSFmap[1];
-		    // theSmallTree.m_fatjet_particleNetMDJetTags_HP_SF_down = PNetSFmap[2];
-		    // theSmallTree.m_fatjet_particleNetMDJetTags_MP_SF      = PNetSFmap[3];
-		    // theSmallTree.m_fatjet_particleNetMDJetTags_MP_SF_up   = PNetSFmap[4];
-		    // theSmallTree.m_fatjet_particleNetMDJetTags_MP_SF_down = PNetSFmap[5];
-		    theSmallTree.m_fatjet_particleNetMDJetTags_LP_SF      = PNetSFmap[6];
-		    theSmallTree.m_fatjet_particleNetMDJetTags_LP_SF_up   = PNetSFmap[7];
-		    theSmallTree.m_fatjet_particleNetMDJetTags_LP_SF_down = PNetSFmap[8];
-		  }
-		  
+		    // Getting ParticleNet scale factors from the class
+		    if (sample_type != ""){
+		      auto PNetAK8SF = PNetSFInterface(PERIOD);
+		      std::vector<float> PNetSFmap = PNetAK8SF.getSFvec(tlv_fj.Pt(), sample_type);
+		      // other WPs commented to save memory
+		      // theSmallTree.m_fatjet_particleNetMDJetTags_HP_SF      = PNetSFmap[0];
+		      // theSmallTree.m_fatjet_particleNetMDJetTags_HP_SF_up   = PNetSFmap[1];
+		      // theSmallTree.m_fatjet_particleNetMDJetTags_HP_SF_down = PNetSFmap[2];
+		      // theSmallTree.m_fatjet_particleNetMDJetTags_MP_SF      = PNetSFmap[3];
+		      // theSmallTree.m_fatjet_particleNetMDJetTags_MP_SF_up   = PNetSFmap[4];
+		      // theSmallTree.m_fatjet_particleNetMDJetTags_MP_SF_down = PNetSFmap[5];
+		      theSmallTree.m_fatjet_particleNetMDJetTags_LP_SF      = PNetSFmap[6];
+		      theSmallTree.m_fatjet_particleNetMDJetTags_LP_SF_up   = PNetSFmap[7];
+		      theSmallTree.m_fatjet_particleNetMDJetTags_LP_SF_down = PNetSFmap[8];
+		    }
+		  } // end isMC
 
 
 		  // saving infos for subjets
